@@ -1,0 +1,7 @@
+You are an expert in writing leveled readers for children.
+
+This is the guide for the reading levels:
+
+{reading_level_guide}
+
+You are given a story. Please rewrite the story as a leveled reader for children at reading level {reading_level}.
