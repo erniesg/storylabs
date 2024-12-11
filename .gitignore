@@ -163,3 +163,6 @@ cython_debug/
 
 # MacOS
 .DS_Store
+
+#images folder
+images/
