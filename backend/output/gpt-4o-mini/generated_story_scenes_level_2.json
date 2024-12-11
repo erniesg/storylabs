@@ -1,11 +1,68 @@
 {
-    "illustration_style": "The illustration style is whimsical and colorful, characterized by soft lines and rounded shapes that appeal to children ages 6-8. The color palette is vibrant, with bright primary colors accentuated by pastel shades, creating a cheerful atmosphere. The characters have exaggerated features, such as big eyes and expressive faces, to convey emotions easily. Backgrounds are rich in detail but not overly busy, featuring lush landscapes, enchanted forests, and charming castles, ensuring they support the storytelling without drawing attention away from the characters. The overall look is playful and inviting, encouraging a sense of wonder and imagination.",
+    "illustration_style": "The illustration style for this story is whimsical and colorful, with a fairy tale aesthetic. Characters are depicted with exaggerated features\u2014big, expressive eyes and playful expressions. The overall color palette is bright and warm, filled with vibrant greens, yellows, and blues, creating a sense of magic and wonder. The buildings and nature are slightly stylized, with swirling patterns and rounded edges, contributing to a dreamy atmosphere. The time period of the story is medieval, evoking a sense of fantasy with castles, enchanted forests, and towers.",
+    "characters": [
+        {
+            "name": "The Woman",
+            "permanent_attributes": {
+                "facial_features": "Soft and gentle features with a kind smile",
+                "hair_colour": "Light brown",
+                "hair_style": "Long and flowing",
+                "body_type": "Average",
+                "height": "Medium",
+                "weight": "Light"
+            }
+        },
+        {
+            "name": "The Husband",
+            "permanent_attributes": {
+                "facial_features": "Strong jawline with a brave and determined expression",
+                "hair_colour": "Dark brown",
+                "hair_style": "Short and slightly wavy",
+                "body_type": "Athletic",
+                "height": "Tall",
+                "weight": "Medium"
+            }
+        },
+        {
+            "name": "The Enchantress",
+            "permanent_attributes": {
+                "facial_features": "Sharp features with a piercing gaze",
+                "hair_colour": "Black",
+                "hair_style": "Long and mysterious, often adorned with flowers",
+                "body_type": "Slim",
+                "height": "Tall",
+                "weight": "Medium"
+            }
+        },
+        {
+            "name": "Rapunzel",
+            "permanent_attributes": {
+                "facial_features": "Delicate features and bright, curious eyes",
+                "hair_colour": "Golden blonde",
+                "hair_style": "Extremely long and smooth, cascading down her back",
+                "body_type": "Slim",
+                "height": "Short",
+                "weight": "Light"
+            }
+        },
+        {
+            "name": "The Prince",
+            "permanent_attributes": {
+                "facial_features": "Handsome with a kind and brave expression",
+                "hair_colour": "Medium brown",
+                "hair_style": "Medium length, styled back",
+                "body_type": "Athletic",
+                "height": "Tall",
+                "weight": "Medium"
+            }
+        }
+    ],
     "scenes": [
         {
             "scene_no": 1,
             "story_text": "Once there was a man and a woman who wanted a baby. They wished for a long time. One day, the woman saw a garden from her window. It was full of beautiful flowers and herbs, but it had a high wall. The garden belonged to a powerful enchantress, and no one dared to go in.",
             "story_image_prompts": {
-                "background_image_prompt": "A magical garden viewed from a window, with vibrant flowers and lush herbs growing behind a tall, vine-covered stone wall under a sunny sky. The scene radiates warmth and longing with a bright atmosphere and a sense of wonder.",
+                "background_image_prompt": "A beautiful garden filled with colorful flowers and lush herbs, surrounded by a high stone wall. The scene is illuminated by warm sunlight, creating a peaceful and hopeful atmosphere.",
                 "character_image_prompts": []
             }
         },
@@ -13,299 +70,648 @@
             "scene_no": 2,
             "story_text": "The woman saw a plant called rampion in the garden. It looked so fresh and green that she really wanted to eat it. She felt so sick without it. Her husband noticed and asked, \"What is wrong, dear wife?\"",
             "story_image_prompts": {
-                "background_image_prompt": "The interior of a cozy home, with sunlight streaming through the window, casting soft shadows. The walls are adorned with simple decorations, and a small table is set with a half-eaten meal. The mood is one of warmth and domestic life.",
-                "character_image_prompts": []
+                "background_image_prompt": "Inside a cozy home with a window overlooking the garden. The room is filled with warm colors and simple furniture. Sunlight streams through the window, casting a warm glow.",
+                "character_image_prompts": [
+                    {
+                        "name": "The Woman",
+                        "image_description": {
+                            "character_pose": "Looking out of the window with a longing expression",
+                            "clothing": {
+                                "clothing_type": "Dress",
+                                "clothing_style": "Simple medieval dress",
+                                "clothing_colour": "Light green",
+                                "clothing_pattern": "Plain",
+                                "clothing_texture": "Soft cotton"
+                            },
+                            "character_expression": "Sad but hopeful.",
+                            "character_prompt": "A woman longing for something beautiful outside her window."
+                        }
+                    },
+                    {
+                        "name": "The Husband",
+                        "image_description": {
+                            "character_pose": "Standing beside her with concern",
+                            "clothing": {
+                                "clothing_type": "Shirt and trousers",
+                                "clothing_style": "Simple medieval outfit",
+                                "clothing_colour": "Brown",
+                                "clothing_pattern": "Plain",
+                                "clothing_texture": "Wool"
+                            },
+                            "character_expression": "Concerned and caring.",
+                            "character_prompt": "A husband showing love and concern for his wife."
+                        }
+                    }
+                ]
             }
         },
         {
             "scene_no": 3,
-            "story_text": "\"I want some rampion from the garden,\" she replied. \"If I can't eat it, I will feel very sad!\" The husband cared for her and thought, \"I will bring her some rampion.\" That night, he climbed over the wall and picked some.",
+            "story_text": "\"I want some rampion from the garden,\" she replied. \"If I can't eat it, I will feel very sad!\"",
             "story_image_prompts": {
-                "background_image_prompt": "The moonlit night outside the garden, with a high wall and shadows cast by the trees. The atmosphere is magical yet slightly ominous, as the man is climbing over the wall, looking determined but nervous.",
+                "background_image_prompt": "The same cozy room filled with sunlight, creating a warm atmosphere. The window is prominently displayed, with the garden visible outside.",
                 "character_image_prompts": [
                     {
-                        "character_name": "Husband",
-                        "character_pose": "climbing the wall",
-                        "character_clothing": "A simple tunic with short sleeves, brown trousers, and sturdy shoes. The tunic is light blue, made from a rough fabric, giving him a peasant-like appearance.",
-                        "character_expression": "determined yet nervous",
-                        "character_prompt": "A man in his 30s, with tousled brown hair, looking over his shoulder as he climbs."
+                        "name": "The Woman",
+                        "image_description": {
+                            "character_pose": "Sitting at a small table, looking sad and holding her stomach as if she is feeling ill",
+                            "clothing": {
+                                "clothing_type": "Dress",
+                                "clothing_style": "Simple medieval dress",
+                                "clothing_colour": "Light green",
+                                "clothing_pattern": "Plain",
+                                "clothing_texture": "Soft cotton"
+                            },
+                            "character_expression": "Sincere and sad.",
+                            "character_prompt": "A woman expressing her longing and discomfort."
+                        }
+                    },
+                    {
+                        "name": "The Husband",
+                        "image_description": {
+                            "character_pose": "Standing with thoughtful demeanor, considering his wife's words",
+                            "clothing": {
+                                "clothing_type": "Shirt and trousers",
+                                "clothing_style": "Simple medieval outfit",
+                                "clothing_colour": "Brown",
+                                "clothing_pattern": "Plain",
+                                "clothing_texture": "Wool"
+                            },
+                            "character_expression": "Determined.",
+                            "character_prompt": "A husband reflecting on how to help his wife."
+                        }
                     }
                 ]
             }
         },
         {
             "scene_no": 4,
-            "story_text": "He gave it to his wife, and she made a salad. It tasted so good that she wanted more the next day. The husband went back to the garden to get more rampion, but this time he saw the enchantress. She was angry. \"How dare you steal my rampion?\" she yelled.",
+            "story_text": "The husband cared for her and thought, \"I will bring her some rampion.\" That night, he climbed over the wall and picked some.",
             "story_image_prompts": {
-                "background_image_prompt": "The vibrant garden, brimming with colorful flowers and lush plants under bright sunlight. The mood is tense as the enchantress confronts the husband, surrounded by a few small puddles from a recent rain, creating a dramatic scene.",
+                "background_image_prompt": "A night scene in a mystical garden with moonlight shining down, highlighting the rampion plant amidst other colorful flowers. The surroundings have a magical glow.",
                 "character_image_prompts": [
                     {
-                        "character_name": "Husband",
-                        "character_pose": "standing nervously",
-                        "character_clothing": "The same light blue tunic and brown trousers, but he now has a worried face, glancing towards the enchantress.",
-                        "character_expression": "worried and scared",
-                        "character_prompt": "The man looks anxious, with hands raised defensively."
-                    },
-                    {
-                        "character_name": "Enchantress",
-                        "character_pose": "angry stance",
-                        "character_clothing": "A long, flowing dress made of shimmering green fabric, adorned with vines. The dress has long sleeves and a high collar, giving her an imposing look.",
-                        "character_expression": "furious",
-                        "character_prompt": "A tall woman with long black hair, wild and surrounded by a sense of magic, glaring at the husband."
+                        "name": "The Husband",
+                        "image_description": {
+                            "character_pose": "Climbing over the wall with a determined but careful expression",
+                            "clothing": {
+                                "clothing_type": "Shirt and trousers",
+                                "clothing_style": "Simple medieval outfit",
+                                "clothing_colour": "Brown",
+                                "clothing_pattern": "Plain",
+                                "clothing_texture": "Wool"
+                            },
+                            "character_expression": "Determined and stealthy.",
+                            "character_prompt": "A cautious husband sneaking into the enchanted garden."
+                        }
                     }
                 ]
             }
         },
         {
             "scene_no": 5,
-            "story_text": "The husband was scared but explained, \"My wife wanted it so much. If she doesn\u2019t eat it, she will be very sad!\" The enchantress felt sorry for him and said, \"You may take as much rampion as you want, but you must give me the child your wife has when it is born. I will take care of the baby.\"",
+            "story_text": "He gave it to his wife, and she made a salad. It tasted so good that she wanted more the next day.",
             "story_image_prompts": {
-                "background_image_prompt": "The enchanted garden, with sunlight filtering through the trees. The mood transitions to one of negotiation, a mix of tension and compassion between the husband and the enchantress, highlighted by soft beams of light creating an ethereal glow.",
+                "background_image_prompt": "The cozy home with a table set for a meal, with a bowl of fresh salad at the center. The room is bright and inviting with warm light.",
                 "character_image_prompts": [
                     {
-                        "character_name": "Husband",
-                        "character_pose": "pleading",
-                        "character_clothing": "Light blue tunic and brown trousers, now with a worried expression, hands clasped together as he beseeches the enchantress.",
-                        "character_expression": "pleading and scared",
-                        "character_prompt": "The man looks earnest, trying to convey his love for his wife."
+                        "name": "The Woman",
+                        "image_description": {
+                            "character_pose": "Joyfully eating salad at the table, with a satisfied smile",
+                            "clothing": {
+                                "clothing_type": "Dress",
+                                "clothing_style": "Simple medieval dress",
+                                "clothing_colour": "Light green",
+                                "clothing_pattern": "Plain",
+                                "clothing_texture": "Soft cotton"
+                            },
+                            "character_expression": "Happy and content.",
+                            "character_prompt": "A woman delighted by a meal made with rampion."
+                        }
                     },
                     {
-                        "character_name": "Enchantress",
-                        "character_pose": "calm yet commanding",
-                        "character_clothing": "The same shimmering green dress, now with a softer look as she shows compassion.",
-                        "character_expression": "serious with a hint of empathy",
-                        "character_prompt": "The enchantress looks stern but understanding, her hair flowing around her."
+                        "name": "The Husband",
+                        "image_description": {
+                            "character_pose": "Sitting across from her, looking pleased as he watches his wife enjoy the food",
+                            "clothing": {
+                                "clothing_type": "Shirt and trousers",
+                                "clothing_style": "Simple medieval outfit",
+                                "clothing_colour": "Brown",
+                                "clothing_pattern": "Plain",
+                                "clothing_texture": "Wool"
+                            },
+                            "character_expression": "Proud and satisfied.",
+                            "character_prompt": "A husband enjoying a moment of happiness with his wife."
+                        }
                     }
                 ]
             }
         },
         {
             "scene_no": 6,
-            "story_text": "When the woman had a baby girl, the enchantress took her and named her Rapunzel. Rapunzel grew up to be very beautiful. When she was twelve, the enchantress locked her in a tall tower. There was no door, only a small window.",
+            "story_text": "The husband went back to the garden to get more rampion, but this time he saw the enchantress. She was angry. \"How dare you steal my rampion?\" she yelled.",
             "story_image_prompts": {
-                "background_image_prompt": "A tall, stone tower surrounded by a dense forest under a bright blue sky and fluffy clouds. The mood is one of isolation and innocence, with flowers blooming at the base of the tower.",
-                "character_image_prompts": []
+                "background_image_prompt": "The enchanting garden during the day, colorful and vibrant, but with a dark cloud forming overhead, symbolizing trouble. The enchantress stands angrily amidst the flowers with a fierce expression.",
+                "character_image_prompts": [
+                    {
+                        "name": "The Enchantress",
+                        "image_description": {
+                            "character_pose": "Standing with arms crossed and an intense glare",
+                            "clothing": {
+                                "clothing_type": "Dress",
+                                "clothing_style": "Long flowing gown",
+                                "clothing_colour": "Deep purple",
+                                "clothing_pattern": "Intricate designs",
+                                "clothing_texture": "Silk"
+                            },
+                            "character_expression": "Furious and commanding.",
+                            "character_prompt": "An enchantress displaying her anger at a thief."
+                        }
+                    },
+                    {
+                        "name": "The Husband",
+                        "image_description": {
+                            "character_pose": "Stumbling back with a scared expression",
+                            "clothing": {
+                                "clothing_type": "Shirt and trousers",
+                                "clothing_style": "Simple medieval outfit",
+                                "clothing_colour": "Brown",
+                                "clothing_pattern": "Plain",
+                                "clothing_texture": "Wool"
+                            },
+                            "character_expression": "Fearful and anxious.",
+                            "character_prompt": "A frightened husband confronted by the enchantress."
+                        }
+                    }
+                ]
             }
         },
         {
             "scene_no": 7,
-            "story_text": "When the enchantress came to visit, she called out, \"Rapunzel, Rapunzel, let down your hair!\" Rapunzel had long, golden hair. She let her hair down, and the enchantress climbed up.",
+            "story_text": "The husband was scared but explained, \"My wife wanted it so much. If she doesn\u2019t eat it, she will be very sad!\"",
             "story_image_prompts": {
-                "background_image_prompt": "The scene shows the top of the tower with a small window, flowers climbing its stones. The atmosphere is cozy as sunlight shines on the golden hair flowing out of the window.",
+                "background_image_prompt": "The same garden, highlighting the tension between the husband and the enchantress. The sun is covered by clouds, casting shadows over the scene.",
                 "character_image_prompts": [
                     {
-                        "character_name": "Rapunzel",
-                        "character_pose": "leaning out of the window",
-                        "character_clothing": "A long, flowing, light purple dress with puffed sleeves, decorated with flowers. Her hair is braided and cascades down the tower.",
-                        "character_expression": "hopeful and friendly",
-                        "character_prompt": "A young girl with long, flowing golden hair, looking eagerly out the window."
+                        "name": "The Husband",
+                        "image_description": {
+                            "character_pose": "Standing with a pleading gesture, hands open in sincerity",
+                            "clothing": {
+                                "clothing_type": "Shirt and trousers",
+                                "clothing_style": "Simple medieval outfit",
+                                "clothing_colour": "Brown",
+                                "clothing_pattern": "Plain",
+                                "clothing_texture": "Wool"
+                            },
+                            "character_expression": "Fearful yet optimistic.",
+                            "character_prompt": "A husband explaining his motives to a powerful enchantress."
+                        }
                     },
                     {
-                        "character_name": "Enchantress",
-                        "character_pose": "climbing",
-                        "character_clothing": "Shimmering green dress with a hint of glamour, flowing behind her as she climbs, looking up at Rapunzel.",
-                        "character_expression": "determined",
-                        "character_prompt": "The enchantress is reaching for Rapunzel's hair, an imposing figure."
+                        "name": "The Enchantress",
+                        "image_description": {
+                            "character_pose": "Leaning forward, arms crossed and frowning",
+                            "clothing": {
+                                "clothing_type": "Dress",
+                                "clothing_style": "Long flowing gown",
+                                "clothing_colour": "Deep purple",
+                                "clothing_pattern": "Intricate designs",
+                                "clothing_texture": "Silk"
+                            },
+                            "character_expression": "Skeptical and unyielding.",
+                            "character_prompt": "An enchantress questioning the intentions of a thief."
+                        }
                     }
                 ]
             }
         },
         {
             "scene_no": 8,
-            "story_text": "One day, a prince rode through the forest. He heard Rapunzel singing and stopped to listen. He wanted to see her but couldn\u2019t find the door. Every day, he came back to hear her lovely voice.",
+            "story_text": "The enchantress felt sorry for him and said, \"You may take as much rampion as you want, but you must give me the child your wife has when it is born. I will take care of the baby.\" The husband was so scared that he agreed.",
             "story_image_prompts": {
-                "background_image_prompt": "A beautiful forest with tall trees and dappled sunlight filtering through the leaves. The mood is peaceful, filled with curiosity as the prince stands beneath the tower, listening intently.",
+                "background_image_prompt": "The tension diffuses slightly in the garden, with soft light breaking through the clouds. Flowers are still vibrant, and the enchantress appears less threatening as she conveys her terms.",
                 "character_image_prompts": [
                     {
-                        "character_name": "Prince",
-                        "character_pose": "sitting on a horse",
-                        "character_clothing": "A regal outfit with a bright blue tunic and gold trim, paired with brown trousers and polished boots. He wears a red cape that flows behind him.",
-                        "character_expression": "curious and enchanted",
-                        "character_prompt": "A handsome young man with wavy dark hair, looking up at the tower."
+                        "name": "The Enchantress",
+                        "image_description": {
+                            "character_pose": "Standing with a commanding gesture, one hand raised as if making a point",
+                            "clothing": {
+                                "clothing_type": "Dress",
+                                "clothing_style": "Long flowing gown",
+                                "clothing_colour": "Deep purple",
+                                "clothing_pattern": "Intricate designs",
+                                "clothing_texture": "Silk"
+                            },
+                            "character_expression": "Stern yet sympathetic.",
+                            "character_prompt": "An enchantress making terms with a humble husband."
+                        }
+                    },
+                    {
+                        "name": "The Husband",
+                        "image_description": {
+                            "character_pose": "Nodding with an anxious expression, hands clasped together",
+                            "clothing": {
+                                "clothing_type": "Shirt and trousers",
+                                "clothing_style": "Simple medieval outfit",
+                                "clothing_colour": "Brown",
+                                "clothing_pattern": "Plain",
+                                "clothing_texture": "Wool"
+                            },
+                            "character_expression": "Terrified but compliant.",
+                            "character_prompt": "A husband agreeing to an enchantress's deal."
+                        }
                     }
                 ]
             }
         },
         {
             "scene_no": 9,
-            "story_text": "One evening, he saw the enchantress come and heard her call for Rapunzel. He thought, \"I will try this too!\" The next day, he called, \"Rapunzel, Rapunzel, let down your hair!\" Her hair fell down, and he climbed up.",
+            "story_text": "When the woman had a baby girl, the enchantress took her and named her Rapunzel. Rapunzel grew up to be very beautiful. When she was twelve, the enchantress locked her in a tall tower. There was no door, only a small window.",
             "story_image_prompts": {
-                "background_image_prompt": "The tower during sunset, casting a golden hue over the forest. The atmosphere is filled with excitement and anticipation, with the prince standing below the tower looking determined.",
-                "character_image_prompts": [
-                    {
-                        "character_name": "Prince",
-                        "character_pose": "standing confidently",
-                        "character_clothing": "The same regal outfit, now with an expression of hope and bravery as he prepares to call for Rapunzel.",
-                        "character_expression": "determined and hopeful",
-                        "character_prompt": "The prince stands tall, looking at the window with excitement."
-                    }
-                ]
+                "background_image_prompt": "A tall tower set against a picturesque landscape, enveloped in soft clouds. A small window can be seen at the top, with flowers climbing the side of the tower, hinting at a hidden beauty inside.",
+                "character_image_prompts": []
             }
         },
         {
             "scene_no": 10,
-            "story_text": "Rapunzel was scared when she saw the prince, but he spoke kindly. He told her that he had to see her because her song was beautiful. Soon, Rapunzel was not afraid anymore. When he asked her to marry him, she said yes!",
+            "story_text": "When the enchantress came to visit, she called out, \"Rapunzel, Rapunzel, let down your hair!\" Rapunzel had long, golden hair. She let her hair down, and the enchantress climbed up.",
             "story_image_prompts": {
-                "background_image_prompt": "The inside of the tower with the small window, light filtering through, making it warm and inviting. The mood shifts to one of joy as Rapunzel meets the prince.",
+                "background_image_prompt": "The enchanting scene of the tower window with Rapunzel's golden hair cascading down. The silhouette of the enchantress is seen climbing up the hair, surrounded by a magical aura.",
                 "character_image_prompts": [
                     {
-                        "character_name": "Rapunzel",
-                        "character_pose": "sitting with hands clasped",
-                        "character_clothing": "Light purple dress with flowers, her golden hair hanging loosely, a look of surprise turning into joy.",
-                        "character_expression": "surprised then joyful",
-                        "character_prompt": "Rapunzel looks at the prince with wide eyes, a smile forming."
+                        "name": "Rapunzel",
+                        "image_description": {
+                            "character_pose": "Leaning out of the window with a gentle smile, letting her hair down",
+                            "clothing": {
+                                "clothing_type": "Dress",
+                                "clothing_style": "Long flowing dress",
+                                "clothing_colour": "Light yellow",
+                                "clothing_pattern": "Simple",
+                                "clothing_texture": "Soft cotton"
+                            },
+                            "character_expression": "Serene and lovely.",
+                            "character_prompt": "A beautiful girl eagerly helping her visitor."
+                        }
                     },
                     {
-                        "character_name": "Prince",
-                        "character_pose": "kneeling respectfully",
-                        "character_clothing": "Regal outfit, looking earnest, leaning closer to Rapunzel.",
-                        "character_expression": "loving and kind",
-                        "character_prompt": "The prince gazes into Rapunzel's eyes, full of affection."
+                        "name": "The Enchantress",
+                        "image_description": {
+                            "character_pose": "Climbing up the hair with an ecstatic expression",
+                            "clothing": {
+                                "clothing_type": "Dress",
+                                "clothing_style": "Long flowing gown",
+                                "clothing_colour": "Deep purple",
+                                "clothing_pattern": "Intricate designs",
+                                "clothing_texture": "Silk"
+                            },
+                            "character_expression": "Determined.",
+                            "character_prompt": "An enchantress scaling a tower with purpose."
+                        }
                     }
                 ]
             }
         },
         {
             "scene_no": 11,
-            "story_text": "She wanted to escape, but she didn\u2019t know how. \"Bring me silk every time you come,\" she said. \"I will make a ladder, and we can leave together.\" They agreed to meet every evening.",
+            "story_text": "One day, a prince rode through the forest. He heard Rapunzel singing and stopped to listen. He wanted to see her but couldn\u2019t find the door.",
             "story_image_prompts": {
-                "background_image_prompt": "The inside of the tower, filled with light from the evening sun, casting shadows around. The mood is hopeful yet pensive, filled with dreams and plans.",
+                "background_image_prompt": "A lush, green forest with sunlight filtering through the trees, creating a magical ambiance. Birds can be seen flying around, adding life to the scene.",
                 "character_image_prompts": [
                     {
-                        "character_name": "Rapunzel",
-                        "character_pose": "determined",
-                        "character_clothing": "Light purple dress, now shown with silk threads in her hands.",
-                        "character_expression": "thinking and hopeful",
-                        "character_prompt": "Rapunzel is looking determined as she speaks to the prince."
-                    },
-                    {
-                        "character_name": "Prince",
-                        "character_pose": "eager, leaning in",
-                        "character_clothing": "Regal outfit, alert and attentive, looking at Rapunzel.",
-                        "character_expression": "enthusiastic",
-                        "character_prompt": "The prince leans forward, listening intently to Rapunzel."
+                        "name": "The Prince",
+                        "image_description": {
+                            "character_pose": "On a horse, looking around with a curious expression",
+                            "clothing": {
+                                "clothing_type": "Armor and tunic",
+                                "clothing_style": "Medieval knight outfit",
+                                "clothing_colour": "Shiny silver and dark green",
+                                "clothing_pattern": "Elegant designs",
+                                "clothing_texture": "Leather and metal"
+                            },
+                            "character_expression": "Intrigued and adventurous.",
+                            "character_prompt": "A prince exploring the forest in search of a beautiful song."
+                        }
                     }
                 ]
             }
         },
         {
             "scene_no": 12,
-            "story_text": "The enchantress didn't notice at first, but one day, Rapunzel said, \"You are so heavy to pull up!\" The enchantress grew angry and cut off Rapunzel's hair. She sent Rapunzel away to live alone.",
+            "story_text": "Every day, he came back to hear her lovely voice.",
             "story_image_prompts": {
-                "background_image_prompt": "The tower now in shadow as darkness looms. The atmosphere turns somber, reflecting the tragedy of the moment as the enchantress reacts angrily.",
+                "background_image_prompt": "A serene forest scene repeated from the previous scene. The light changes to simulate different times of day, showing the passage of time.",
                 "character_image_prompts": [
                     {
-                        "character_name": "Rapunzel",
-                        "character_pose": "shocked and distressed",
-                        "character_clothing": "Light purple dress, now looking ragged as her hair is caught in a cutting motion.",
-                        "character_expression": "shocked and grieving",
-                        "character_prompt": "Rapunzel looks horrified, covering her mouth in despair."
-                    },
-                    {
-                        "character_name": "Enchantress",
-                        "character_pose": "furious and threatening",
-                        "character_clothing": "Shimmering green dress flowing as she stands with scissors raised, face contorted with rage.",
-                        "character_expression": "angry and determined",
-                        "character_prompt": "The enchantress is in a fierce pose, looking intensely at Rapunzel."
+                        "name": "The Prince",
+                        "image_description": {
+                            "character_pose": "Sitting on his horse with a thoughtful expression, gazing towards the tower in the distance",
+                            "clothing": {
+                                "clothing_type": "Armor and tunic",
+                                "clothing_style": "Medieval knight outfit",
+                                "clothing_colour": "Shiny silver and dark green",
+                                "clothing_pattern": "Elegant designs",
+                                "clothing_texture": "Leather and metal"
+                            },
+                            "character_expression": "Longing and curious.",
+                            "character_prompt": "A prince patiently waiting and listening for the sweet song of Rapunzel."
+                        }
                     }
                 ]
             }
         },
         {
             "scene_no": 13,
-            "story_text": "When the prince came and called, \"Rapunzel, Rapunzel, let down your hair!\" the enchantress let down the cut hair instead. The prince climbed up, but there was no Rapunzel. The enchantress laughed, \"She is gone! You will never see her again!\"",
+            "story_text": "One evening, he saw the enchantress come and heard her call for Rapunzel. He thought, \"I will try this too!\" The next day, he called, \"Rapunzel, Rapunzel, let down your hair!\" Her hair fell down, and he climbed up.",
             "story_image_prompts": {
-                "background_image_prompt": "The interior of the tower showing the prince climbing up the cut hair, the atmosphere filled with confusion and tension as the enchantress observes from the shadows.",
+                "background_image_prompt": "The enchanting tower from a distance, highlighting the silhouette of the prince below, with twilight colors framing the scene in shades of purple and gold as the prince calls for Rapunzel.",
                 "character_image_prompts": [
                     {
-                        "character_name": "Prince",
-                        "character_pose": "confused and desperate",
-                        "character_clothing": "Regal outfit, mid-climb, looking up in disbelief.",
-                        "character_expression": "shocked and confused",
-                        "character_prompt": "The prince is halfway up, looking back in horror as he realizes something is wrong."
-                    },
-                    {
-                        "character_name": "Enchantress",
-                        "character_pose": "arrogant and mocking",
-                        "character_clothing": "Same green dress, now with an air of superiority as she stands back, arms crossed.",
-                        "character_expression": "gleeful and mocking",
-                        "character_prompt": "The enchantress is smirking, enjoying the prince's despair."
+                        "name": "The Prince",
+                        "image_description": {
+                            "character_pose": "Standing confidently below the tower, reaching out in a calling gesture",
+                            "clothing": {
+                                "clothing_type": "Armor and tunic",
+                                "clothing_style": "Medieval knight outfit",
+                                "clothing_colour": "Shiny silver and dark green",
+                                "clothing_pattern": "Elegant designs",
+                                "clothing_texture": "Leather and metal"
+                            },
+                            "character_expression": "Confident and hopeful.",
+                            "character_prompt": "A prince calling for Rapunzel, eager to meet her."
+                        }
                     }
                 ]
             }
         },
         {
             "scene_no": 14,
-            "story_text": "The prince was heartbroken. He jumped from the tower and landed in a thorny bush. He hurt his eyes and could not see! He wandered through the forest for many years, feeling sad.",
+            "story_text": "Rapunzel was scared when she saw the prince, but he spoke kindly. He told her that he had to see her because her song was beautiful. Soon, Rapunzel was not afraid anymore.",
             "story_image_prompts": {
-                "background_image_prompt": "A dark, overgrown forest with thick brambles and shadows. The atmosphere is somber and melancholic, reflecting the prince's despair after leaving the tower.",
+                "background_image_prompt": "The cozy room inside the tower with the warm light creating a comforting atmosphere. A hint of flowers can be seen, indicating beauty.",
                 "character_image_prompts": [
                     {
-                        "character_name": "Prince",
-                        "character_pose": "falling from the tower",
-                        "character_clothing": "Regal outfit, now torn, as he lands into the thorny bush.",
-                        "character_expression": "heartbroken and pained",
-                        "character_prompt": "The prince is falling, hands reaching out, with a look of anguish."
+                        "name": "Rapunzel",
+                        "image_description": {
+                            "character_pose": "Standing hesitantly but gradually opening up, with a gentle smile as she looks towards the prince",
+                            "clothing": {
+                                "clothing_type": "Dress",
+                                "clothing_style": "Long flowing dress",
+                                "clothing_colour": "Light yellow",
+                                "clothing_pattern": "Simple",
+                                "clothing_texture": "Soft cotton"
+                            },
+                            "character_expression": "Curious but nervous.",
+                            "character_prompt": "A girl timidly meeting a prince for the first time."
+                        }
+                    },
+                    {
+                        "name": "The Prince",
+                        "image_description": {
+                            "character_pose": "Kneeling down in a gentle manner, looking up at her with admiration",
+                            "clothing": {
+                                "clothing_type": "Armor and tunic",
+                                "clothing_style": "Medieval knight outfit",
+                                "clothing_colour": "Shiny silver and dark green",
+                                "clothing_pattern": "Elegant designs",
+                                "clothing_texture": "Leather and metal"
+                            },
+                            "character_expression": "Gentle and kind.",
+                            "character_prompt": "A prince showing his respect and admiration for Rapunzel."
+                        }
                     }
                 ]
             }
         },
         {
             "scene_no": 15,
-            "story_text": "One day, he heard a familiar voice. It was Rapunzel! She had twins, a boy and a girl. When she saw him, she cried and hugged him. Her tears fell on his eyes, and he could see again!",
+            "story_text": "When he asked her to marry him, she said yes! She wanted to escape, but she didn\u2019t know how. \"Bring me silk every time you come,\" she said. \"I will make a ladder, and we can leave together.\" They agreed to meet every evening.",
             "story_image_prompts": {
-                "background_image_prompt": "A bright and sunny meadow, blooming with flowers, representing hope and joy. The mood shifts back to one of happiness and reunion, with laughter in the air.",
+                "background_image_prompt": "The interior of the tower filled with sunlight, enhancing the warmth of the moment. Soft silk fabric can be seen on the table, representing their plan.",
                 "character_image_prompts": [
                     {
-                        "character_name": "Rapunzel",
-                        "character_pose": "joyfully hugging the prince",
-                        "character_clothing": "Light purple dress, with added floral patterns now that she's a mother.",
-                        "character_expression": "joyful and loving",
-                        "character_prompt": "Rapunzel is smiling widely, embracing the prince with happiness."
+                        "name": "Rapunzel",
+                        "image_description": {
+                            "character_pose": "Sitting on the floor, smiling brightly at the prince, excited about their future",
+                            "clothing": {
+                                "clothing_type": "Dress",
+                                "clothing_style": "Long flowing dress",
+                                "clothing_colour": "Light yellow",
+                                "clothing_pattern": "Simple",
+                                "clothing_texture": "Soft cotton"
+                            },
+                            "character_expression": "Excited and hopeful.",
+                            "character_prompt": "A girl dreaming of her future with the prince."
+                        }
                     },
                     {
-                        "character_name": "Prince",
-                        "character_pose": "kneeling and crying with joy",
-                        "character_clothing": "Same regal outfit, though slightly weathered, now looking hopeful.",
-                        "character_expression": "overjoyed and amazed",
-                        "character_prompt": "The prince has tears of happiness, looking at Rapunzel with love."
-                    },
-                    {
-                        "character_name": "Twins",
-                        "character_pose": "playing nearby",
-                        "character_clothing": "Each wearing simple clothes; a boy in a light blue tunic and girl in a yellow dress, both with happy expressions.",
-                        "character_expression": "joyful and mischievous",
-                        "character_prompt": "Two small children playing, looking excited and giggling."
+                        "name": "The Prince",
+                        "image_description": {
+                            "character_pose": "Standing proudly with a confident yet gentle posture, gesturing as if outlining their escape plan",
+                            "clothing": {
+                                "clothing_type": "Armor and tunic",
+                                "clothing_style": "Medieval knight outfit",
+                                "clothing_colour": "Shiny silver and dark green",
+                                "clothing_pattern": "Elegant designs",
+                                "clothing_texture": "Leather and metal"
+                            },
+                            "character_expression": "Hopeful and determined.",
+                            "character_prompt": "A prince excitedly discussing their future together."
+                        }
                     }
                 ]
             }
         },
         {
             "scene_no": 16,
-            "story_text": "The prince took Rapunzel and their children to his kingdom. They were happy together, living a joyful life.",
+            "story_text": "The enchantress didn't notice at first, but one day, Rapunzel said, \"You are so heavy to pull up!\" The enchantress grew angry and cut off Rapunzel's hair. She sent Rapunzel away to live alone.",
             "story_image_prompts": {
-                "background_image_prompt": "A beautiful royal palace garden, vibrant with flowers and sunshine, symbolizing happiness and new beginnings. The mood is joyful and festive, filled with color and life.",
+                "background_image_prompt": "A darkened forest where the energy feels tense and foreboding. The tower appears in the background, and trees intertwine menacingly around it, indicating danger.",
                 "character_image_prompts": [
                     {
-                        "character_name": "Rapunzel",
-                        "character_pose": "smiling and waving",
-                        "character_clothing": "Light purple dress with bells and beads, elegant yet comfortable as she enjoys her family.",
-                        "character_expression": "happy and content",
-                        "character_prompt": "Rapunzel looks joyful, relishing her new life."
+                        "name": "Rapunzel",
+                        "image_description": {
+                            "character_pose": "Standing alone with a scared expression, her hair drastically shorter",
+                            "clothing": {
+                                "clothing_type": "Dress",
+                                "clothing_style": "Long flowing dress",
+                                "clothing_colour": "Light yellow",
+                                "clothing_pattern": "Simple",
+                                "clothing_texture": "Soft cotton"
+                            },
+                            "character_expression": "Sad and scared.",
+                            "character_prompt": "A girl heartbroken after losing her beautiful hair."
+                        }
                     },
                     {
-                        "character_name": "Prince",
-                        "character_pose": "standing proudly next to Rapunzel",
-                        "character_clothing": "Regal outfit, with a slight embellishment showing his status as a husband.",
-                        "character_expression": "proud and happy",
-                        "character_prompt": "The prince stands beside her, a big smile on his face."
+                        "name": "The Enchantress",
+                        "image_description": {
+                            "character_pose": "Standing menacingly with a pair of scissors in her hand, looking furious",
+                            "clothing": {
+                                "clothing_type": "Dress",
+                                "clothing_style": "Long flowing gown",
+                                "clothing_colour": "Deep purple",
+                                "clothing_pattern": "Intricate designs",
+                                "clothing_texture": "Silk"
+                            },
+                            "character_expression": "Angry and cold.",
+                            "character_prompt": "An enchantress displaying her fury after being confronted."
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "scene_no": 17,
+            "story_text": "When the prince came and called, \"Rapunzel, Rapunzel, let down your hair!\" the enchantress let down the cut hair instead. The prince climbed up, but there was no Rapunzel. The enchantress laughed, \"She is gone! You will never see her again!\"",
+            "story_image_prompts": {
+                "background_image_prompt": "The tower in the dark of night with a strangely ominous atmosphere. Shadows cast by the moon amplify the sense of danger as the enchantress stands triumphantly on the tower.",
+                "character_image_prompts": [
+                    {
+                        "name": "The Enchantress",
+                        "image_description": {
+                            "character_pose": "Looking out of the tower with a smug grin, holding the cut hair",
+                            "clothing": {
+                                "clothing_type": "Dress",
+                                "clothing_style": "Long flowing gown",
+                                "clothing_colour": "Deep purple",
+                                "clothing_pattern": "Intricate designs",
+                                "clothing_texture": "Silk"
+                            },
+                            "character_expression": "Triumphant and cruel.",
+                            "character_prompt": "An enchantress reveling in her victory."
+                        }
                     },
                     {
-                        "character_name": "Twins",
-                        "character_pose": "playing around their parents",
-                        "character_clothing": "The boy in light blue tunic and girl in yellow dress, running and laughing.",
-                        "character_expression": "joyful and carefree",
-                        "character_prompt": "Children running around, full of energy and laughter."
+                        "name": "The Prince",
+                        "image_description": {
+                            "character_pose": "Climbing up the hair with a determined yet confused expression",
+                            "clothing": {
+                                "clothing_type": "Armor and tunic",
+                                "clothing_style": "Medieval knight outfit",
+                                "clothing_colour": "Shiny silver and dark green",
+                                "clothing_pattern": "Elegant designs",
+                                "clothing_texture": "Leather and metal"
+                            },
+                            "character_expression": "Shocked and desperate.",
+                            "character_prompt": "A prince reaching for hope but finding despair."
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "scene_no": 18,
+            "story_text": "The prince was heartbroken. He jumped from the tower and landed in a thorny bush. He hurt his eyes and could not see! He wandered through the forest for many years, feeling sad.",
+            "story_image_prompts": {
+                "background_image_prompt": "A dense, dark forest filled with thorns and twisted trees. The atmosphere feels lonely and gloomy as shadows loom around.",
+                "character_image_prompts": [
+                    {
+                        "name": "The Prince",
+                        "image_description": {
+                            "character_pose": "Falling from the tower with arms outstretched, face showing fear and sadness",
+                            "clothing": {
+                                "clothing_type": "Armor and tunic",
+                                "clothing_style": "Medieval knight outfit",
+                                "clothing_colour": "Shiny silver and dark green",
+                                "clothing_pattern": "Elegant designs",
+                                "clothing_texture": "Leather and metal"
+                            },
+                            "character_expression": "Fearful and hopeless.",
+                            "character_prompt": "A prince in the act of leaping to the unknown."
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "scene_no": 19,
+            "story_text": "One day, he heard a familiar voice. It was Rapunzel! She had twins, a boy and a girl. When she saw him, she cried and hugged him. Her tears fell on his eyes, and he could see again!",
+            "story_image_prompts": {
+                "background_image_prompt": "A sunny garden filled with vibrant colors and a feeling of joy. Flowers bloom everywhere, and a gentle breeze wafts through the air as they reconnect.",
+                "character_image_prompts": [
+                    {
+                        "name": "Rapunzel",
+                        "image_description": {
+                            "character_pose": "Holding her twins close, with a joyful and surprised expression",
+                            "clothing": {
+                                "clothing_type": "Dress",
+                                "clothing_style": "Long flowing dress",
+                                "clothing_colour": "Light yellow",
+                                "clothing_pattern": "Simple",
+                                "clothing_texture": "Soft cotton"
+                            },
+                            "character_expression": "Excited and loving.",
+                            "character_prompt": "A happy mother embraced in joy."
+                        }
+                    },
+                    {
+                        "name": "The Prince",
+                        "image_description": {
+                            "character_pose": "Kneeling down with a look of disbelief and joy as he reaches out to her",
+                            "clothing": {
+                                "clothing_type": "Armor and tunic",
+                                "clothing_style": "Medieval knight outfit",
+                                "clothing_colour": "Shiny silver and dark green",
+                                "clothing_pattern": "Elegant designs",
+                                "clothing_texture": "Leather and metal"
+                            },
+                            "character_expression": "Astonished and joyful.",
+                            "character_prompt": "A prince finding hope and joy in reunion."
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "scene_no": 20,
+            "story_text": "The prince took Rapunzel and their children to his kingdom. They were happy together, living a joyful life.",
+            "story_image_prompts": {
+                "background_image_prompt": "A majestic kingdom in the background, shown during a bright day. The scene is filled with laughter and joy as they walk together hand in hand, surrounded by friendly townsfolk and a vibrant atmosphere.",
+                "character_image_prompts": [
+                    {
+                        "name": "Rapunzel",
+                        "image_description": {
+                            "character_pose": "Walking hand-in-hand with the prince, radiating happiness",
+                            "clothing": {
+                                "clothing_type": "Dress",
+                                "clothing_style": "Long flowing dress",
+                                "clothing_colour": "Light yellow",
+                                "clothing_pattern": "Simple",
+                                "clothing_texture": "Soft cotton"
+                            },
+                            "character_expression": "Joyful and content.",
+                            "character_prompt": "A mother embracing a joyful life."
+                        }
+                    },
+                    {
+                        "name": "The Prince",
+                        "image_description": {
+                            "character_pose": "Standing tall and proud with an arm around Rapunzel, looking forward",
+                            "clothing": {
+                                "clothing_type": "Armor and tunic",
+                                "clothing_style": "Medieval knight outfit",
+                                "clothing_colour": "Shiny silver and dark green",
+                                "clothing_pattern": "Elegant designs",
+                                "clothing_texture": "Leather and metal"
+                            },
+                            "character_expression": "Proud and happy.",
+                            "character_prompt": "A prince celebrating life with his family."
+                        }
+                    },
+                    {
+                        "name": "The Twins",
+                        "image_description": {
+                            "character_pose": "Being held by Rapunzel, one girl and one boy, both looking cheerful",
+                            "clothing": {
+                                "clothing_type": "Simple tunics",
+                                "clothing_style": "Playful and colorful",
+                                "clothing_colour": "Light blue and pink",
+                                "clothing_pattern": "Plain",
+                                "clothing_texture": "Soft cotton"
+                            },
+                            "character_expression": "Happy and giggling.",
+                            "character_prompt": "Two joyful children exploring the world."
+                        }
                     }
                 ]
             }
