@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@openai/realtime-api-beta": "github:openai/openai-realtime-api-beta",
-    "@radix-ui/react-slot": "*",
+    "@radix-ui/react-slot": "^1.1.1",
     "@types/react": "*",
     "@types/react-dom": "*",
     "class-variance-authority": "^0.7.1",
