@@ -25,8 +25,7 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
   const [events, setEvents] = useState<StoryEvent[]>([])
   const [isAudioPlaying, setIsAudioPlaying] = useState(false)
   const [currentScene, setCurrentScene] = useState<ParsedScene | null>(null)
-  const [eventStatus, setEventStatus] = useState<'pending' | 'playing' | 'complete'>('pending')
-  
+
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number | undefined>(undefined)
   const isLoadedRef = useRef<boolean>(false)
@@ -42,8 +41,12 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
     }
 
     let mounted = true
+    let initialized = false
 
     async function initializeStory() {
+      if (initialized) return
+      initialized = true
+
       try {
         // Create and connect sequencer
         const seq = new StorySequencer({ apiKey })
@@ -71,7 +74,6 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
         // Start first event
         const firstEvent = await seq.processNextEvent()
         if (firstEvent && mounted) {
-          setEventStatus('playing')
           setIsAudioPlaying(true)
         }
       } catch (error) {
@@ -134,52 +136,30 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
     }
   }, [])
 
-  // Event completion monitoring
-  useEffect(() => {
-    if (!sequencer || !events[currentEventIndex]) return;
-    
-    const checkInterval = setInterval(() => {
-      if (!events[currentEventIndex]) return;
-      
-      const status = sequencer.getEventStatus(events[currentEventIndex].id);
-      if (status === 'complete') {
-        setEventStatus('complete');
-        setIsAudioPlaying(false);
-        clearInterval(checkInterval);
-      }
-    }, 100);
-
-    return () => clearInterval(checkInterval);
-  }, [sequencer, events, currentEventIndex]);
-
   // Audio playback controls
   const playCurrentEvent = async () => {
-    if (!sequencer || eventStatus === 'playing') return;
+    if (!sequencer || isAudioPlaying) return;
 
     await audioService.unlockAudio();
-    setEventStatus('playing');
     setIsAudioPlaying(true);
 
     try {
       await sequencer.processNextEvent();
     } catch (error) {
       console.error('Error playing event:', error);
-      setEventStatus('pending');
       setIsAudioPlaying(false);
     }
   };
 
   const goToNextEvent = async () => {
-    if (currentEventIndex < events.length - 1 && eventStatus !== 'playing') {
+    if (currentEventIndex < events.length - 1 && !isAudioPlaying) {
       setCurrentEventIndex(prev => prev + 1)
-      setEventStatus('pending')
     }
   }
 
   const goToPreviousEvent = async () => {
-    if (currentEventIndex > 0 && eventStatus !== 'playing') {
+    if (currentEventIndex > 0 && !isAudioPlaying) {
       setCurrentEventIndex(prev => prev - 1)
-      setEventStatus('pending')
     }
   }
 
@@ -203,6 +183,9 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
           />
+        </AnimatePresence>
+        
+        <AnimatePresence mode="wait">
           {currentEvent?.character && (
             <motion.div
               key={`character-${currentEventIndex}`}
@@ -258,7 +241,7 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
 
         <Button
           onClick={playCurrentEvent}
-          disabled={isAudioPlaying || eventStatus === 'complete'}
+          disabled={isAudioPlaying}
           variant="default"
         >
           {isAudioPlaying ? 'Playing...' : 'Play'}

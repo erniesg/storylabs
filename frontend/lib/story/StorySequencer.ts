@@ -174,6 +174,7 @@ export class StorySequencer {
       this.currentEventId = undefined;
       return null;
     }
+
   }
 
   public getEventStatus(eventId: string): 'pending' | 'playing' | 'complete' | null {
