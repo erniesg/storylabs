@@ -1,3 +1,4 @@
+// frontend/app/components/StoryInterface.tsx
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
@@ -7,7 +8,8 @@ import { SceneParser } from '@/lib/story/SceneParser'
 import { StorySequencer } from '@/lib/story/StorySequencer'
 import { WavRenderer } from '@/lib/wavtools/WavRenderer'
 import type { ParsedScene, StoryEvent } from '@/lib/story/SceneParser'
-import { WavStreamPlayer, WavRecorder } from '@/lib/wavtools'
+import { audioService } from '@/lib/audio/AudioService'
+import type { AudioState } from '@/lib/audio/AudioService'
 
 interface StoryInterfaceProps {
   userInfo: {
@@ -22,65 +24,55 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
   const [sequencer, setSequencer] = useState<StorySequencer | null>(null)
   const [events, setEvents] = useState<StoryEvent[]>([])
   const [isAudioPlaying, setIsAudioPlaying] = useState(false)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const animationRef = useRef<number | undefined>(undefined)
-  const isLoadedRef = useRef<boolean>(false)
   const [currentScene, setCurrentScene] = useState<ParsedScene | null>(null)
   const [eventStatus, setEventStatus] = useState<'pending' | 'playing' | 'complete'>('pending')
   
-  // Audio processing refs
-  const wavRecorderRef = useRef<WavRecorder>(
-    new WavRecorder({ sampleRate: 24000 })
-  )
-  const wavStreamPlayerRef = useRef<WavStreamPlayer>(
-    new WavStreamPlayer({ sampleRate: 24000 })
-  )
-  
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const animationRef = useRef<number | undefined>(undefined)
+  const isLoadedRef = useRef<boolean>(false)
+
   // Initialize with env variable
   const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY
 
+  // Initialize story and audio
   useEffect(() => {
     if (!apiKey) {
       console.error('Missing OPENAI_API_KEY')
       return
     }
 
+    let mounted = true
+
     async function initializeStory() {
       try {
-        console.log('Initializing story...')
+        // Create and connect sequencer
         const seq = new StorySequencer({ apiKey })
         await seq.connect()
-        console.log('Sequencer connected')
+        
+        if (!mounted) return
         setSequencer(seq)
 
-        // Connect audio components
-        await wavStreamPlayerRef.current.connect()
-        await wavRecorderRef.current.begin()
+        // Load story assets
+        const [charactersText, sceneText] = await Promise.all([
+          fetch('/stories/characters.md').then(r => r.text()),
+          fetch('/stories/scene_rocket_intro.md').then(r => r.text())
+        ])
 
-        // Load characters and scene
-        const charactersResponse = await fetch('/stories/characters.md')
-        const sceneResponse = await fetch('/stories/scene_rocket_intro.md')
-        
-        const charactersText = await charactersResponse.text()
-        const sceneText = await sceneResponse.text()
-
-        // Parse scene
+        // Parse and load scene
         const parser = new SceneParser(charactersText)
         const scene = parser.parseScene(sceneText)
-        
-        // Load scene into sequencer and set state
         await seq.loadScene(scene)
+        
+        if (!mounted) return
         setEvents(scene.events)
         setCurrentScene(scene)
         isLoadedRef.current = true
 
-        // Process first event automatically
-        console.log('Processing first event...')
+        // Start first event
         const firstEvent = await seq.processNextEvent()
-        if (firstEvent) {
+        if (firstEvent && mounted) {
           setEventStatus('playing')
           setIsAudioPlaying(true)
-          console.log('First event started:', firstEvent)
         }
       } catch (error) {
         console.error('Error initializing story:', error)
@@ -89,22 +81,12 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
 
     initializeStory()
 
-    // Cleanup
     return () => {
+      mounted = false
       isLoadedRef.current = false
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current)
       }
-      
-      // Check recorder status before ending
-      if (wavRecorderRef.current?.getStatus() === 'recording') {
-        wavRecorderRef.current?.end()
-      }
-      
-      // Interrupt player if active
-      wavStreamPlayerRef.current?.interrupt()
-      
-      // Disconnect sequencer last
       if (sequencer) {
         sequencer.disconnect()
       }
@@ -113,45 +95,36 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
 
   // Audio visualization
   useEffect(() => {
-    if (!sequencer || !canvasRef.current) return
+    if (!canvasRef.current) return
 
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Set initial canvas dimensions
     canvas.width = canvas.offsetWidth
     canvas.height = canvas.offsetHeight
 
     const render = () => {
-      if (!isLoadedRef.current || !ctx || !sequencer) return
+      if (!isLoadedRef.current || !ctx) return
 
-      // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      // Get frequencies from both recorder and player
-      const recorderFreq = wavRecorderRef.current.getFrequencies('voice')
-      const playerFreq = wavStreamPlayerRef.current.getFrequencies('voice')
-      
-      // Use player frequencies when playing, recorder when recording
-      const frequencies = isAudioPlaying ? playerFreq : recorderFreq
-
+      const frequencies = audioService.getFrequencies('voice')
       if (frequencies) {
         WavRenderer.drawBars(
           canvas,
           ctx,
           frequencies.values,
-          '#9333ea', // Purple color
-          10,        // Bar width
-          0,         // Min height
-          8          // Scale
+          '#9333ea',
+          10,
+          0,
+          8
         )
       }
 
       animationRef.current = requestAnimationFrame(render)
     }
 
-    // Start render loop
     render()
 
     return () => {
@@ -159,64 +132,54 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [sequencer])
+  }, [])
 
+  // Event completion monitoring
+  useEffect(() => {
+    if (!sequencer || !events[currentEventIndex]) return;
+    
+    const checkInterval = setInterval(() => {
+      if (!events[currentEventIndex]) return;
+      
+      const status = sequencer.getEventStatus(events[currentEventIndex].id);
+      if (status === 'complete') {
+        setEventStatus('complete');
+        setIsAudioPlaying(false);
+        clearInterval(checkInterval);
+      }
+    }, 100);
+
+    return () => clearInterval(checkInterval);
+  }, [sequencer, events, currentEventIndex]);
+
+  // Audio playback controls
   const playCurrentEvent = async () => {
-    if (!sequencer || eventStatus === 'playing') return
+    if (!sequencer || eventStatus === 'playing') return;
 
-    console.log('Playing event:', currentEventIndex)
-    setEventStatus('playing')
-    setIsAudioPlaying(true)
+    await audioService.unlockAudio();
+    setEventStatus('playing');
+    setIsAudioPlaying(true);
 
     try {
-      const event = await sequencer.processNextEvent()
-      if (event) {
-        console.log('Event processed:', event)
-        // Wait for the event to complete
-        const checkStatus = setInterval(() => {
-          const status = sequencer.getEventStatus(event.id)
-          console.log('Event status:', status)
-          if (status === 'complete') {
-            clearInterval(checkStatus)
-            setEventStatus('complete')
-            setCurrentEventIndex(prev => prev + 1)
-            setIsAudioPlaying(false)
-          }
-        }, 100)
-      }
+      await sequencer.processNextEvent();
     } catch (error) {
-      console.error('Error playing event:', error)
-      setEventStatus('pending')
-      setIsAudioPlaying(false)
+      console.error('Error playing event:', error);
+      setEventStatus('pending');
+      setIsAudioPlaying(false);
     }
-  }
-
-  const replayCurrentEvent = async () => {
-    if (!sequencer || !currentEvent) return
-    
-    setIsAudioPlaying(true)
-    setEventStatus('playing')
-    await sequencer.replayEvent(currentEvent.id)
-    setEventStatus('complete')
-    setIsAudioPlaying(false)
-  }
+  };
 
   const goToNextEvent = async () => {
     if (currentEventIndex < events.length - 1 && eventStatus !== 'playing') {
+      setCurrentEventIndex(prev => prev + 1)
       setEventStatus('pending')
-      await playCurrentEvent()
     }
   }
 
   const goToPreviousEvent = async () => {
     if (currentEventIndex > 0 && eventStatus !== 'playing') {
       setCurrentEventIndex(prev => prev - 1)
-      const eventId = events[currentEventIndex - 1].id
-      setEventStatus('playing')
-      setIsAudioPlaying(true)
-      await sequencer?.replayEvent(eventId)
-      setEventStatus('complete')
-      setIsAudioPlaying(false)
+      setEventStatus('pending')
     }
   }
 
@@ -266,7 +229,6 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
         </AnimatePresence>
       </div>
 
-      {/* Audio Visualization */}
       <div className="mb-6 bg-gray-100 rounded-lg p-4">
         <canvas 
           ref={canvasRef}
@@ -289,25 +251,23 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
         <Button
           onClick={goToPreviousEvent}
           disabled={currentEventIndex === 0 || isAudioPlaying}
-          className="text-lg py-2 px-4 bg-purple-500 hover:bg-purple-600 text-white font-bold rounded-full transition-all duration-200"
+          variant="outline"
         >
           Previous
         </Button>
-        
-        {eventStatus === 'complete' && (
-          <Button
-            onClick={replayCurrentEvent}
-            disabled={isAudioPlaying}
-            className="text-lg py-2 px-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-all duration-200"
-          >
-            Replay
-          </Button>
-        )}
+
+        <Button
+          onClick={playCurrentEvent}
+          disabled={isAudioPlaying || eventStatus === 'complete'}
+          variant="default"
+        >
+          {isAudioPlaying ? 'Playing...' : 'Play'}
+        </Button>
 
         <Button
           onClick={goToNextEvent}
-          disabled={currentEventIndex === events.length - 1 || isAudioPlaying}
-          className="text-lg py-2 px-4 bg-yellow-400 hover:bg-yellow-500 text-purple-800 font-bold rounded-full transition-all duration-200"
+          disabled={currentEventIndex >= events.length - 1 || isAudioPlaying}
+          variant="outline"
         >
           Next
         </Button>
