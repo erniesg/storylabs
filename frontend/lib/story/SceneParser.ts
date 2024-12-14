@@ -1,8 +1,8 @@
-// Export these interfaces
+// SceneParser.ts
 export interface Character {
   name: string;
   prompt: string;
-  voice: "alloy" | "echo" | "shimmer" | "ash" | "ballad" | "coral" | "sage" | "verse";
+  voice: "alloy" | "echo" | "shimmer" | "ash" | "ballad" | "coral" | "sage" | "verse" | "nova";
   personality: {
     trait: string;
     goal: string;
@@ -31,14 +31,28 @@ export class SceneParser {
     this.parseCharacters(charactersMarkdown);
   }
 
+  private validateCharacter(character: Partial<Character>): boolean {
+    return !!(
+      character.name &&
+      character.prompt &&
+      character.voice &&
+      character.personality?.trait &&
+      character.personality?.goal &&
+      character.personality?.speech_style
+    );
+  }
+
   private parseCharacters(markdown: string): void {
     const lines = markdown.split('\n');
     let currentCharacter: Partial<Character> | null = null;
 
     for (const line of lines) {
+      // Skip empty lines and comments
+      if (!line.trim() || line.startsWith('#')) continue;
+
       if (line.startsWith('@character:')) {
-        // Save previous character if exists
-        if (currentCharacter?.name) {
+        // Save previous character if exists and valid
+        if (currentCharacter?.name && this.validateCharacter(currentCharacter)) {
           this.characters.set(currentCharacter.name, currentCharacter as Character);
         }
         // Start new character
@@ -51,17 +65,29 @@ export class SceneParser {
         currentCharacter.voice = line.split('voice:')[1].trim() as Character['voice'];
       } else if (line.startsWith('personality:') && currentCharacter) {
         try {
-          const personalityStr = line.split('personality:')[1];
-          currentCharacter.personality = JSON.parse(personalityStr);
+          const personalityStr = line.split('personality:')[1].trim();
+          // Remove any extra whitespace and ensure valid JSON
+          const cleanJson = personalityStr.replace(/\s+/g, ' ').trim();
+          currentCharacter.personality = JSON.parse(cleanJson);
         } catch (e) {
-          console.error('Error parsing personality:', e);
+          console.error(`Error parsing personality for character ${currentCharacter.name}:`, e);
+          // Set default personality if parsing fails
+          currentCharacter.personality = {
+            trait: "friendly",
+            goal: "help tell the story",
+            speech_style: "clear and warm"
+          };
         }
       }
     }
-    // Save last character
-    if (currentCharacter?.name) {
+    
+    // Save last character if valid
+    if (currentCharacter?.name && this.validateCharacter(currentCharacter)) {
       this.characters.set(currentCharacter.name, currentCharacter as Character);
     }
+
+    // Log parsed characters for debugging
+    console.log('Parsed characters:', Array.from(this.characters.entries()));
   }
 
   public parseScene(markdown: string): ParsedScene {
@@ -71,6 +97,9 @@ export class SceneParser {
     let sceneName = '';
 
     for (const line of lines) {
+      // Skip empty lines and comments
+      if (!line.trim() || line.startsWith('#')) continue;
+
       if (line.startsWith('@scene:')) {
         sceneName = line.split('@scene:')[1].trim();
       } else if (line.startsWith('@id:')) {
@@ -122,38 +151,28 @@ export class SceneParser {
       }
     }
 
+    // Log parsed scene for debugging
+    console.log('Parsed scene:', {
+      id: sceneId,
+      scene: sceneName,
+      eventCount: events.length,
+      events: events
+    });
+
     return {
       id: sceneId,
       scene: sceneName,
       events
     };
   }
-}
 
-// Example usage:
-/*
-const parser = new SceneParser(charactersMarkdown);
-const scene = parser.parseScene(sceneMarkdown);
+  // Helper method to get a character by name
+  public getCharacter(name: string): Character | undefined {
+    return this.characters.get(name);
+  }
 
-// scene will contain:
-{
-  id: "rocket_intro",
-  scene: "rocket_pad",
-  events: [
-    {
-      type: "narrate",
-      character: { name: "Narrator", voice: "nova", ... },
-      text: "Xavier, look! There's a special rocket ship...",
-      id: "rocket_intro_narrate_0"
-    },
-    {
-      type: "speak",
-      character: { name: "Captain Zip", voice: "ash", ... },
-      text: "Hello, space explorer Xavier!...",
-      emotion: "welcoming",
-      id: "rocket_intro_speak_1"
-    },
-    // ...
-  ]
+  // Helper method to get all characters
+  public getAllCharacters(): Character[] {
+    return Array.from(this.characters.values());
+  }
 }
-*/

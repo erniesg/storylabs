@@ -101,6 +101,14 @@ export class StorySequencer {
         serverUrl: this.options.serverUrl
       });
 
+      // Set up initial session configuration
+      await this.client.updateSession({
+        modalities: ['text', 'audio'],
+        output_audio_format: 'pcm16',
+        input_audio_transcription: { model: 'whisper-1' },
+        turn_detection: { type: 'server_vad' }
+      });
+
       // Connect audio player
       await this.player.connect();
       console.log('StorySequencer connected successfully');
@@ -163,7 +171,7 @@ export class StorySequencer {
       switch (pendingEvent.type) {
         case 'narrate':
         case 'speak':
-        case 'input':  // Handle input just like narration
+        case 'input':
           // Construct character instructions
           const characterInstructions = pendingEvent.character 
             ? `You are ${pendingEvent.character.name}. ${pendingEvent.character.prompt}. 
@@ -176,21 +184,31 @@ export class StorySequencer {
                warm, and filled with wonder.
                Say exactly: "${pendingEvent.text}"`;
 
-          console.log('Sending response with instructions:', {
-            voice: pendingEvent.character?.voice || 'nova',
+          // Update session with ALL required parameters
+          await this.client.updateSession({
+            modalities: ['text', 'audio'],
+            voice: pendingEvent.character?.voice || 'sage',
+            instructions: characterInstructions,
+            output_audio_format: 'pcm16',
+            input_audio_transcription: { model: 'whisper-1' },
+            turn_detection: { type: 'server_vad' }
+          });
+
+          console.log('Sending message and response:', {
+            voice: pendingEvent.character?.voice || 'sage',
             instructions: characterInstructions.substring(0, 100) + '...'
           });
 
-          // Send response configuration directly
-          this.client.realtime.send('response.create', {
-            response: {
-              modalities: ['text', 'audio'],
-              voice: pendingEvent.character?.voice || 'nova', // Default to Narrator voice
-              instructions: characterInstructions,
-              temperature: 0.7,
-              output_audio_format: 'pcm16'
+          // First send the user message
+          await this.client.sendUserMessageContent([
+            { 
+              type: 'input_text', 
+              text: pendingEvent.text 
             }
-          });
+          ]);
+
+          // Then create the response
+          await this.client.realtime.send('response.create');
           break;
       }
 

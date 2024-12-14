@@ -24,13 +24,23 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "types": [
+      "node",
+      "lodash",
+      "react",
+      "react-dom"
+    ],
+    "forceConsistentCasingInFileNames": true,
+    "target": "es5",
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "**/*.d.ts"
   ],
   "exclude": [
     "node_modules"
