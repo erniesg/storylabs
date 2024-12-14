@@ -8,6 +8,8 @@ interface OpenAIConfig {
 class OpenAIService {
   private static instance: OpenAIService;
   private client: RealtimeClient | null = null;
+  private isInitializing: boolean = false;
+  private initPromise: Promise<RealtimeClient> | null = null;
 
   private constructor() {}
 
@@ -18,29 +20,50 @@ class OpenAIService {
     return OpenAIService.instance;
   }
 
-  async initialize(config: OpenAIConfig) {
-    if (this.client) {
-      await this.client.disconnect();
+  async initialize(config: OpenAIConfig): Promise<RealtimeClient> {
+    if (this.isInitializing) {
+      return this.initPromise!;
     }
 
-    this.client = new RealtimeClient(
-      config.serverUrl
-        ? { url: config.serverUrl }
-        : {
-            apiKey: config.apiKey,
-            dangerouslyAllowAPIKeyInBrowser: true,
-          }
-    );
+    this.isInitializing = true;
+    this.initPromise = (async () => {
+      try {
+        // Disconnect existing client if any
+        if (this.client) {
+          await this.client.disconnect();
+        }
 
-    await this.client.connect();
+        // Create new client
+        this.client = new RealtimeClient(
+          config.serverUrl
+            ? { url: config.serverUrl }
+            : {
+                apiKey: config.apiKey,
+                dangerouslyAllowAPIKeyInBrowser: true,
+              }
+        );
 
-    // Configure default session settings for TTS
-    this.client.updateSession({
-      modalities: ['text', 'audio'],
-      output_audio_format: 'pcm16',
-    });
+        // Connect and configure
+        await this.client.connect();
+        
+        // Configure default session settings for TTS
+        this.client.updateSession({
+          modalities: ['text', 'audio'],
+          output_audio_format: 'pcm16',
+          turn_detection: null, // Disable VAD since we're not doing continuous voice input
+        });
 
-    return this.client;
+        return this.client;
+      } catch (error) {
+        this.client = null;
+        throw error;
+      } finally {
+        this.isInitializing = false;
+        this.initPromise = null;
+      }
+    })();
+
+    return this.initPromise;
   }
 
   getClient(): RealtimeClient {
@@ -50,11 +73,15 @@ class OpenAIService {
     return this.client;
   }
 
-  async disconnect() {
+  async disconnect(): Promise<void> {
     if (this.client) {
       await this.client.disconnect();
       this.client = null;
     }
+  }
+
+  isConnected(): boolean {
+    return this.client?.isConnected() || false;
   }
 }
 
@@ -64,8 +91,12 @@ export const openAIService = OpenAIService.getInstance();
 // Helper function to get initialized client
 export async function getOpenAIClient(config: OpenAIConfig): Promise<RealtimeClient> {
   const service = OpenAIService.getInstance();
-  if (!service.getClient()) {
-    await service.initialize(config);
+  
+  // If client exists and is connected, return it
+  if (service.isConnected()) {
+    return service.getClient();
   }
-  return service.getClient();
+
+  // Initialize new client
+  return service.initialize(config);
 }
