@@ -9,7 +9,6 @@ import { StorySequencer } from '@/lib/story/StorySequencer'
 import { WavRenderer } from '@/lib/wavtools/WavRenderer'
 import type { ParsedScene, StoryEvent } from '@/lib/story/SceneParser'
 import { audioService } from '@/lib/audio/AudioService'
-import type { AudioState } from '@/lib/audio/AudioService'
 
 interface StoryInterfaceProps {
   userInfo: {
@@ -20,80 +19,65 @@ interface StoryInterfaceProps {
 }
 
 export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
-  const [currentEventIndex, setCurrentEventIndex] = useState(0)
-  const [sequencer, setSequencer] = useState<StorySequencer | null>(null)
-  const [events, setEvents] = useState<StoryEvent[]>([])
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false)
-  const [currentScene, setCurrentScene] = useState<ParsedScene | null>(null)
+  // Essential states
+  const [sequencer, setSequencer] = useState<StorySequencer | null>(null);
+  const [currentEventIndex, setCurrentEventIndex] = useState(0);
+  const [scene, setScene] = useState<ParsedScene | null>(null);
 
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const animationRef = useRef<number | undefined>(undefined)
-  const isLoadedRef = useRef<boolean>(false)
+  // Refs
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number | undefined>(undefined);
+  // Derived state
+  const currentEvent = scene?.events[currentEventIndex];
+  const isAudioPlaying = sequencer?.getEventStatus(currentEvent?.id || '') === 'playing';
 
   // Initialize with env variable
   const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY
 
-  // Initialize story and audio
   useEffect(() => {
-    if (!apiKey) {
-      console.error('Missing OPENAI_API_KEY')
-      return
-    }
+    if (!apiKey) return;
 
-    let mounted = true
-    let initialized = false
+    let mounted = true;
 
     async function initializeStory() {
-      if (initialized) return
-      initialized = true
-
       try {
-        // Create and connect sequencer
-        const seq = new StorySequencer({ apiKey })
-        await seq.connect()
+        const seq = new StorySequencer({ apiKey });
+        await seq.connect();
         
-        if (!mounted) return
-        setSequencer(seq)
+        if (!mounted) return;
+        setSequencer(seq);
 
         // Load story assets
         const [charactersText, sceneText] = await Promise.all([
           fetch('/stories/characters.md').then(r => r.text()),
           fetch('/stories/scene_rocket_intro.md').then(r => r.text())
-        ])
+        ]);
 
         // Parse and load scene
-        const parser = new SceneParser(charactersText)
-        const scene = parser.parseScene(sceneText)
-        await seq.loadScene(scene)
+        const parser = new SceneParser(charactersText);
+        const parsedScene = parser.parseScene(sceneText);
+        await seq.loadScene(parsedScene);
         
-        if (!mounted) return
-        setEvents(scene.events)
-        setCurrentScene(scene)
-        isLoadedRef.current = true
+        if (!mounted) return;
+        setScene(parsedScene);
 
-        // Start first event
-        const firstEvent = await seq.processNextEvent()
-        if (firstEvent && mounted) {
-          setIsAudioPlaying(true)
-        }
+        // Unlock audio and auto-play first event
+        await audioService.unlockAudio();
+        await seq.processNextEvent();
       } catch (error) {
-        console.error('Error initializing story:', error)
+        console.error('Error initializing story:', error);
       }
     }
 
-    initializeStory()
-
+    initializeStory();
     return () => {
-      mounted = false
-      isLoadedRef.current = false
+      mounted = false;
       if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
+        cancelAnimationFrame(animationRef.current);
       }
-      if (sequencer) {
-        sequencer.disconnect()
-      }
-    }
-  }, [apiKey])
+      sequencer?.disconnect();
+    };
+  }, [apiKey]);
 
   // Audio visualization
   useEffect(() => {
@@ -107,7 +91,7 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
     canvas.height = canvas.offsetHeight
 
     const render = () => {
-      if (!isLoadedRef.current || !ctx) return
+      if (!scene || !ctx) return
 
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
@@ -134,36 +118,26 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [])
+  }, [scene])
 
   // Audio playback controls
   const playCurrentEvent = async () => {
-    if (!sequencer || isAudioPlaying) return;
-
+    if (!sequencer || isAudioPlaying || !currentEvent) return;
     await audioService.unlockAudio();
-    setIsAudioPlaying(true);
+    await sequencer.processNextEvent();
+  };
 
-    try {
-      await sequencer.processNextEvent();
-    } catch (error) {
-      console.error('Error playing event:', error);
-      setIsAudioPlaying(false);
+  const goToNextEvent = () => {
+    if (scene && currentEventIndex < scene.events.length - 1 && !isAudioPlaying) {
+      setCurrentEventIndex(prev => prev + 1);
     }
   };
 
-  const goToNextEvent = async () => {
-    if (currentEventIndex < events.length - 1 && !isAudioPlaying) {
-      setCurrentEventIndex(prev => prev + 1)
-    }
-  }
-
-  const goToPreviousEvent = async () => {
+  const goToPreviousEvent = () => {
     if (currentEventIndex > 0 && !isAudioPlaying) {
-      setCurrentEventIndex(prev => prev - 1)
+      setCurrentEventIndex(prev => prev - 1);
     }
-  }
-
-  const currentEvent = events[currentEventIndex]
+  };
 
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full">
@@ -175,7 +149,7 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
         <AnimatePresence mode="wait">
           <motion.img
             key={`backdrop-${currentEventIndex}`}
-            src={`/assets/scenes/${currentEvent ? currentScene?.scene || 'default' : 'default'}.jpg`}
+            src={`/assets/scenes/${currentEvent ? scene?.scene || 'default' : 'default'}.jpg`}
             alt="Story backdrop"
             className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
             initial={{ opacity: 0 }}
@@ -249,7 +223,7 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
 
         <Button
           onClick={goToNextEvent}
-          disabled={currentEventIndex >= events.length - 1 || isAudioPlaying}
+          disabled={currentEventIndex >= scene?.events.length - 1 || isAudioPlaying}
           variant="outline"
         >
           Next

@@ -29,29 +29,28 @@ export class StorySequencer {
   }
 
   private setupClientHandlers() {
-    let currentStreamId: string | null = null;
-
     this.client.on('conversation.updated', async ({ item, delta }) => {
-      // Handle new audio chunks
-      if (delta?.audio) {
-        currentStreamId = item.id;
+      // Only handle audio chunks if we have a current event
+      if (delta?.audio && this.currentEventId) {
+        const audioEvent = this.audioEvents.get(this.currentEventId);
+        if (audioEvent) {
+          audioEvent.status = 'playing';
+        }
         await audioService.streamAudioChunk(delta.audio, item.id);
       }
 
-      // Handle completion
-      if (item.status === 'completed') {
-        currentStreamId = null;
-        const audioEvent = this.audioEvents.get(this.currentEventId!);
+      if (item.status === 'completed' && this.currentEventId) {
+        const audioEvent = this.audioEvents.get(this.currentEventId);
         if (audioEvent) {
           audioEvent.status = 'complete';
           this.isProcessing = false;
           this.currentEventId = undefined;
+          this.processNextEvent();
         }
       }
     });
 
     this.client.on('conversation.interrupted', async () => {
-      currentStreamId = null;
       await audioService.interrupt();
       this.isProcessing = false;
       this.currentEventId = undefined;
@@ -112,6 +111,8 @@ export class StorySequencer {
       });
     }
     console.log('Scene loaded, events initialized:', this.audioEvents.size);
+    
+    await this.processNextEvent();
   }
 
   public async processNextEvent(): Promise<AudioEvent | null> {
@@ -137,6 +138,7 @@ export class StorySequencer {
     this.isProcessing = true;
     this.currentEventId = pendingEvent.id;
     const audioEvent = this.audioEvents.get(pendingEvent.id)!;
+    audioEvent.status = 'playing';
 
     try {
       const characterInstructions = pendingEvent.character 
@@ -172,6 +174,7 @@ export class StorySequencer {
       console.error('Error processing audio event:', error);
       this.isProcessing = false;
       this.currentEventId = undefined;
+      audioEvent.status = 'pending';
       return null;
     }
 
