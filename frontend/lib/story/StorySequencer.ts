@@ -30,27 +30,30 @@ export class StorySequencer {
 
   private setupClientHandlers() {
     this.client.on('conversation.updated', async ({ item, delta }) => {
-      // Only handle audio chunks if we have a current event
+      // Handle audio chunks as they come in
       if (delta?.audio && this.currentEventId) {
-        const audioEvent = this.audioEvents.get(this.currentEventId);
-        if (audioEvent) {
-          audioEvent.status = 'playing';
-        }
+        console.log('Received audio chunk for event:', this.currentEventId);
         await audioService.streamAudioChunk(delta.audio, item.id);
       }
 
+      // Only handle completion when the conversation is actually complete
       if (item.status === 'completed' && this.currentEventId) {
+        console.log('Event completed:', this.currentEventId);
         const audioEvent = this.audioEvents.get(this.currentEventId);
         if (audioEvent) {
-          audioEvent.status = 'complete';
-          this.isProcessing = false;
-          this.currentEventId = undefined;
-          this.processNextEvent();
+          // Wait a small delay to ensure all audio has finished playing
+          setTimeout(() => {
+            audioEvent.status = 'complete';
+            this.isProcessing = false;
+            this.currentEventId = undefined;
+            this.processNextEvent();
+          }, 500); // Add a small buffer to ensure audio completion
         }
       }
     });
 
     this.client.on('conversation.interrupted', async () => {
+      console.log('Conversation interrupted');
       await audioService.interrupt();
       this.isProcessing = false;
       this.currentEventId = undefined;
