@@ -7,7 +7,7 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Your frontend URL
+    allow_origins=["http://localhost:3000", "http://frontend:3000"],  # Add the docker service name
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
