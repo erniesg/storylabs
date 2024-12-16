@@ -16,6 +16,7 @@ export function useStoryGeneration({ userInfo }: UseStoryGenerationProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log('useEffect triggered with userInfo:', userInfo);
     async function generateStory() {
       setIsLoading(true);
       setError(null);
@@ -41,7 +42,7 @@ export function useStoryGeneration({ userInfo }: UseStoryGenerationProps) {
         setIsLoading(false);
       }
     }
-
+    console.log('Generating story...');
     generateStory();
   }, [userInfo]);
 

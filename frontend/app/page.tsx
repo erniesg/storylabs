@@ -11,7 +11,9 @@ export default function Home() {
 
   const handleStart = () => setStage('userInput')
   const handleUserInfoSubmit = (info: typeof userInfo) => {
+    console.log('User info submitted:', info);
     setUserInfo(info)
+    console.log('User info set:', userInfo);
     setStage('story')
   }
 

@@ -13,7 +13,7 @@ export interface Character {
 export interface StoryEvent {
   type: 'narrate' | 'speak' | 'input';
   character?: Character;
-  text: string;
+  content: string;
   emotion?: string;
   id: string;
 }

@@ -35,10 +35,8 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
   const isAudioPlaying = sequencer?.getEventStatus(currentEvent?.id || '') === 'playing';
   const currentSceneId = story?.story.main.flow[currentSceneIndex];
 
-  const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-
   useEffect(() => {
-    if (!story || !apiKey || !currentSceneId) return;
+    if (!story || !currentSceneId) return;
 
     let mounted = true;
 
@@ -46,8 +44,7 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
       try {
         let seq = sequencer;
         if (!seq) {
-          seq = new StorySequencer({ apiKey });
-          await seq.connect();
+          seq = new StorySequencer({});
           if (!mounted) return;
           setSequencer(seq);
         }
@@ -56,7 +53,7 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
         if (!sceneContent) return;
 
         const parser = new SceneParser(JSON.stringify(story.story.characters));
-        const parsedScene = parser.parseScene(sceneContent); // Pass the sceneContent directly
+        const parsedScene = parser.parseScene(sceneContent);
         await seq.loadScene(parsedScene);
 
         if (!mounted) return;
@@ -74,7 +71,7 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
     return () => {
       mounted = false;
     };
-  }, [story, apiKey, currentSceneId]);
+  }, [story, currentSceneId]);
 
   useEffect(() => {
     // ... Audio visualization code ...
@@ -144,19 +141,6 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
           <ImageComponent prompt={scene?.prompt || ''} />
         </AnimatePresence>
       </div>
-      <div className="mb-6 bg-gray-100 rounded-lg p-4">
-        <canvas ref={canvasRef} className="w-full h-24" />
-      </div>
-      <motion.p
-        key={`text-${currentEventIndex}`}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-xl text-gray-800 mb-6 text-center"
-      >
-        {currentEvent?.text}
-      </motion.p>
       <div className="text-lg text-gray-700 mb-6">
         {currentEvent?.content} {/* Display the event content */}
       </div>
