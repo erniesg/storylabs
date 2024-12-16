@@ -638,6 +638,28 @@ trio = ["trio (>=0.23)"]
 wmi = ["wmi (>=1.5.1)"]
 
 [[package]]
+name = "elevenlabs"
+version = "1.50.2"
+description = ""
+optional = false
+python-versions = "<4.0,>=3.8"
+files = [
+    {file = "elevenlabs-1.50.2-py3-none-any.whl", hash = "sha256:5af32a365317c3183eb64d3458eb412f761729a2bcdda59c4ec225f0a44f6f7d"},
+    {file = "elevenlabs-1.50.2.tar.gz", hash = "sha256:899c7fc19ae6cfd7b270cb9e5191d6c70506d7ab46e136dd700b93e927591cda"},
+]
+
+[package.dependencies]
+httpx = ">=0.21.2"
+pydantic = ">=1.9.2"
+pydantic-core = ">=2.18.2,<3.0.0"
+requests = ">=2.20"
+typing_extensions = ">=4.0.0"
+websockets = ">=11.0"
+
+[package.extras]
+pyaudio = ["pyaudio (>=0.2.14)"]
+
+[[package]]
 name = "email-validator"
 version = "2.2.0"
 description = "A robust email address syntax and deliverability validation library."
@@ -3514,4 +3536,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "3.12"
-content-hash = "41930ec220d438756b08fe4652b8dfe27908c9f0db2240091c27a4d42f28a0e3"
+content-hash = "056b616b6d9778c210ea64371643ed25f7055154cf8af0d9ad0a8a7570c84310"

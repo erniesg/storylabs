@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from openai import OpenAI
+from elevenlabs import ElevenLabs
 import os
 from datetime import datetime
 import uuid
@@ -10,7 +11,8 @@ from ..models.story_generation import Story
 import logging
 import replicate
 from fastapi.responses import StreamingResponse
-
+from io import BytesIO
+from pathlib import Path
 logger = logging.getLogger(__name__)
 load_dotenv()
 router = APIRouter()
@@ -93,5 +95,43 @@ async def generate_image(request: ImageRequest):
             headers={"Content-Disposition": f"attachment; filename=image.png"}
         )
     
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+client = ElevenLabs(
+    api_key=os.environ["ELEVENLABS_API_KEY"],
+)
+
+class AudioRequest(BaseModel):
+    text: str
+
+def save_audio_from_generator(generator):
+    audio_stream = BytesIO()
+    for chunk in generator:
+        audio_stream.write(chunk)
+    audio_stream.seek(0)  # Reset the stream position to the beginning
+    return audio_stream
+
+@router.post("/generate-audio")
+async def generate_audio(request: AudioRequest):
+    try:
+        # Generate the audio
+        audio_generator = client.text_to_speech.convert(
+            voice_id="iUqOXhMfiOIbBejNtfLR",
+            output_format="mp3_44100_128",
+            text=request.text,
+            model_id="eleven_multilingual_v2",
+        )
+
+        # Get the audio stream
+        audio_stream = save_audio_from_generator(audio_generator)
+
+        # Return the audio as a StreamingResponse
+        return StreamingResponse(
+            audio_stream,
+            media_type="audio/mpeg",
+            headers={"Content-Disposition": "attachment; filename=output_audio.mp3"}
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
