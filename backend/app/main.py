@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.endpoints import story
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +12,9 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
+
+#make images directory if it doesn't exist
+os.makedirs("images", exist_ok=True)
 
 # Mount the images directory to serve static files
 app.mount("/images", StaticFiles(directory="images"), name="images")
