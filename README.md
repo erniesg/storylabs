@@ -8,8 +8,9 @@
 
 ### Running with Docker
 
-1. Using the start script:
+1. Build the docker image and run the container:
    ```bash
-   chmod +x start.sh
-   ./start.sh
+   docker-compose up --build
    ```
+
+2. Access the application at http://localhost:3000
