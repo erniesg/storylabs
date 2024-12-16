@@ -10,11 +10,11 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
+
 downloads/
 eggs/
 .eggs/
-lib/
+
 lib64/
 parts/
 sdist/
@@ -160,3 +160,48 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+# MacOS
+.DS_Store
+
+#images folder
+images/
+
+node_modules
+.next
+.env*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Cache and temp
+.cache/
+.temp/
+/public/temp/
+
+# PWA files
+**/public/sw.js
+**/public/workbox-*.js
+**/public/worker-*.js
+**/public/sw.js.map
+**/public/workbox-*.js.map
+**/public/worker-*.js.map
+
+# Debug
+.pnpm-debug.log*
+
+# Build output and dependencies
+# frontend/lib/wavtools/dist/
+# frontend/dist/
+# frontend/build/
+# **/dist/
+# **/build/
+
+# Next.js build and cache
+.next/
+**/node_modules/@next/
+**/.next/cache/
+**/.next/static/
