@@ -25,9 +25,7 @@ export const generateStory = async (userInfo: {
 
     const data = await response.json();
     return {
-        main: data.main,
-        characters: data.characters,
-        scenes: data.scenes
+        story: data
     };
   } catch (error) {
     console.error('Error generating story:', error);
@@ -54,3 +52,5 @@ export async function fetchGeneratedImage(prompt: string): Promise<string> {
     console.log('Image URL:', imageUrl);
     return imageUrl;
   }
+
+

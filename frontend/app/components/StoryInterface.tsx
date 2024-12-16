@@ -14,14 +14,15 @@ import ImageComponent from './ImageComponent' // Import the ImageComponent
 
 interface StoryInterfaceProps {
   userInfo: {
-    name: string
-    age: string
-    interests: string
-  }
+    name: string;
+    age: string;
+    interests: string;
+  };
+  story: any; // Replace 'any' with the actual type of your story object
+  generationError: string | null;
 }
 
-export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
-  const { story, isLoading: isGenerating, error: generationError } = useStoryGeneration({ userInfo });
+export default function StoryInterface({ userInfo, story, generationError }: StoryInterfaceProps) {
 
   const [sequencer, setSequencer] = useState<StorySequencer | null>(null);
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
@@ -106,15 +107,6 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
       setCurrentEventIndex(prev => prev - 1);
     }
   };
-
-  if (isGenerating) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <LoadingSpinner />
-        <p className="ml-2">Generating your story...</p>
-      </div>
-    );
-  }
 
   if (generationError) {
     return (
