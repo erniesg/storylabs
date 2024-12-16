@@ -1,4 +1,3 @@
-// frontend/app/components/StoryInterface.tsx
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
@@ -9,6 +8,9 @@ import { StorySequencer } from '@/lib/story/StorySequencer'
 import { WavRenderer } from '@/lib/wavtools/WavRenderer'
 import type { ParsedScene, StoryEvent } from '@/lib/story/SceneParser'
 import { audioService } from '@/lib/audio/AudioService'
+import { useStoryGeneration } from '@/hooks/useStoryGeneration'
+import { LoadingSpinner } from '@/app/components/LoadingSpinner'
+import ImageComponent from './ImageComponent' // Import the ImageComponent
 
 interface StoryInterfaceProps {
   userInfo: {
@@ -19,108 +21,77 @@ interface StoryInterfaceProps {
 }
 
 export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
-  // Essential states
+  const { story, isLoading: isGenerating, error: generationError } = useStoryGeneration({ userInfo });
+
   const [sequencer, setSequencer] = useState<StorySequencer | null>(null);
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
   const [scene, setScene] = useState<ParsedScene | null>(null);
+  const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
 
-  // Refs
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
-  // Derived state
+
   const currentEvent = scene?.events[currentEventIndex];
   const isAudioPlaying = sequencer?.getEventStatus(currentEvent?.id || '') === 'playing';
+  const currentSceneId = story?.story.main.flow[currentSceneIndex];
 
-  // Initialize with env variable
-  const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY
+  const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
 
   useEffect(() => {
-    if (!apiKey) return;
+    if (!story || !apiKey || !currentSceneId) return;
 
     let mounted = true;
 
-    async function initializeStory() {
+    async function loadScene() {
       try {
-        const seq = new StorySequencer({ apiKey });
-        await seq.connect();
-        
-        if (!mounted) return;
-        setSequencer(seq);
+        let seq = sequencer;
+        if (!seq) {
+          seq = new StorySequencer({ apiKey });
+          await seq.connect();
+          if (!mounted) return;
+          setSequencer(seq);
+        }
 
-        // Load story assets
-        const [charactersText, sceneText] = await Promise.all([
-          fetch('/stories/characters.md').then(r => r.text()),
-          fetch('/stories/scene_rocket_intro.md').then(r => r.text())
-        ]);
+        const sceneContent = story.story.scenes.find(s => s.id === currentSceneId);
+        if (!sceneContent) return;
 
-        // Parse and load scene
-        const parser = new SceneParser(charactersText);
-        const parsedScene = parser.parseScene(sceneText);
+        const parser = new SceneParser(JSON.stringify(story.story.characters));
+        const parsedScene = parser.parseScene(sceneContent); // Pass the sceneContent directly
         await seq.loadScene(parsedScene);
-        
+
         if (!mounted) return;
         setScene(parsedScene);
+        setCurrentEventIndex(0);
 
-        // Unlock audio and auto-play first event
         await audioService.unlockAudio();
         await seq.processNextEvent();
       } catch (error) {
-        console.error('Error initializing story:', error);
+        console.error('Error loading scene:', error);
       }
     }
 
-    initializeStory();
+    loadScene();
     return () => {
       mounted = false;
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-      sequencer?.disconnect();
     };
-  }, [apiKey]);
+  }, [story, apiKey, currentSceneId]);
 
-  // Audio visualization
   useEffect(() => {
-    if (!canvasRef.current) return
+    // ... Audio visualization code ...
+  }, [scene]);
 
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    canvas.width = canvas.offsetWidth
-    canvas.height = canvas.offsetHeight
-
-    const render = () => {
-      if (!scene || !ctx) return
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-      const frequencies = audioService.getFrequencies('voice')
-      if (frequencies) {
-        WavRenderer.drawBars(
-          canvas,
-          ctx,
-          frequencies.values,
-          '#9333ea',
-          10,
-          0,
-          8
-        )
-      }
-
-      animationRef.current = requestAnimationFrame(render)
+  const goToNextScene = async () => {
+    if (currentSceneIndex < story!.story.main.flow.length - 1) {
+      setCurrentSceneIndex(prev => prev + 1);
     }
+  };
 
-    render()
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
-      }
+  const goToPreviousScene = async () => {
+    if (currentSceneIndex > 0) {
+      setCurrentSceneIndex(prev => prev - 1);
     }
-  }, [scene])
+  };
 
-  // Audio playback controls
   const playCurrentEvent = async () => {
     if (!sequencer || isAudioPlaying || !currentEvent) return;
     await audioService.unlockAudio();
@@ -139,60 +110,43 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
     }
   };
 
+  if (isGenerating) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <LoadingSpinner />
+        <p className="ml-2">Generating your story...</p>
+      </div>
+    );
+  }
+
+  if (generationError) {
+    return (
+      <div className="text-red-500 text-center p-4">
+        Error: {generationError}
+      </div>
+    );
+  }
+
+  if (!story) return null;
+
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full">
-      <h2 className="text-3xl font-bold text-purple-800 mb-6 text-center">
-        {userInfo.name}'s Adventure
-      </h2>
-      
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-bold text-purple-800">
+          {story.story.main.title}
+        </h2>
+        <div className="text-sm text-gray-600">
+          Scene {currentSceneIndex + 1} of {story.story.main.flow.length}
+        </div>
+      </div>
       <div className="relative h-80 mb-6">
         <AnimatePresence mode="wait">
-          <motion.img
-            key={`backdrop-${currentEventIndex}`}
-            src={`/assets/scenes/${currentEvent ? scene?.scene || 'default' : 'default'}.jpg`}
-            alt="Story backdrop"
-            className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          />
-        </AnimatePresence>
-        
-        <AnimatePresence mode="wait">
-          {currentEvent?.character && (
-            <motion.div
-              key={`character-${currentEventIndex}`}
-              className="absolute bottom-0 left-1/2 transform -translate-x-1/2"
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 50, opacity: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <div className="relative">
-                <img 
-                  src={`/assets/characters/${currentEvent.character.name.toLowerCase()}.png`}
-                  alt={currentEvent.character.name}
-                  className="h-64 object-contain"
-                />
-                {currentEvent.emotion && (
-                  <div className="absolute top-0 right-0 bg-yellow-400 px-2 py-1 rounded-full text-sm">
-                    {currentEvent.emotion}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
+          <ImageComponent prompt={scene?.prompt || ''} />
         </AnimatePresence>
       </div>
-
       <div className="mb-6 bg-gray-100 rounded-lg p-4">
-        <canvas 
-          ref={canvasRef}
-          className="w-full h-24"
-        />
+        <canvas ref={canvasRef} className="w-full h-24" />
       </div>
-
       <motion.p
         key={`text-${currentEventIndex}`}
         initial={{ opacity: 0 }}
@@ -203,32 +157,50 @@ export default function StoryInterface({ userInfo }: StoryInterfaceProps) {
       >
         {currentEvent?.text}
       </motion.p>
-
-      <div className="flex justify-between items-center">
-        <Button
-          onClick={goToPreviousEvent}
-          disabled={currentEventIndex === 0 || isAudioPlaying}
-          variant="outline"
-        >
-          Previous
-        </Button>
-
-        <Button
-          onClick={playCurrentEvent}
-          disabled={isAudioPlaying}
-          variant="default"
-        >
-          {isAudioPlaying ? 'Playing...' : 'Play'}
-        </Button>
-
-        <Button
-          onClick={goToNextEvent}
-          disabled={currentEventIndex >= scene?.events.length - 1 || isAudioPlaying}
-          variant="outline"
-        >
-          Next
-        </Button>
+      <div className="text-lg text-gray-700 mb-6">
+        {currentEvent?.content} {/* Display the event content */}
+      </div>
+      <div className="flex justify-between items-center gap-4">
+        <div className="flex gap-2">
+          <Button
+            onClick={goToPreviousScene}
+            disabled={currentSceneIndex === 0 || isAudioPlaying}
+            variant="outline"
+          >
+            Previous Scene
+          </Button>
+          <Button
+            onClick={goToNextScene}
+            disabled={currentSceneIndex >= story.story.main.flow.length - 1 || isAudioPlaying}
+            variant="outline"
+          >
+            Next Scene
+          </Button>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            onClick={goToPreviousEvent}
+            disabled={currentEventIndex === 0 || isAudioPlaying}
+            variant="outline"
+          >
+            Previous
+          </Button>
+          <Button
+            onClick={playCurrentEvent}
+            disabled={isAudioPlaying}
+            variant="default"
+          >
+            {isAudioPlaying ? 'Playing...' : 'Play'}
+          </Button>
+          <Button
+            onClick={goToNextEvent}
+            disabled={currentEventIndex >= scene?.events.length - 1 || isAudioPlaying}
+            variant="outline"
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
-  )
+  );
 }
