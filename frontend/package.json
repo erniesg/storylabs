@@ -1,0 +1,35 @@
+{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@openai/realtime-api-beta": "github:openai/openai-realtime-api-beta",
+    "@radix-ui/react-slot": "^1.1.1",
+    "@radix-ui/react-toast": "^1.2.3",
+    "@types/react": "*",
+    "@types/react-dom": "*",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.14.4",
+    "lodash": "^4.17.21",
+    "lucide-react": "^0.468.0",
+    "next": "^14.2.20",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "shadcn": "^1.0.0",
+    "tailwind-merge": "^2.5.5",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@shadcn/ui": "*",
+    "@types/lodash": "^4.17.13",
+    "@types/node": "*",
+    "autoprefixer": "*",
+    "postcss": "*",
+    "tailwindcss": "*",
+    "typescript": "*"
+  }
+}

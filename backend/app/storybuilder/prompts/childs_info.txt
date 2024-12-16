@@ -1,0 +1,4 @@
+The child's name is {child_name}.
+The child's age is {child_age}.
+The child's interests are {child_interests}.
+BEGIN!

@@ -1,0 +1,6 @@
+fastapi==0.115.5
+openai==1.55.3
+python-dotenv==1.0.1
+replicate==1.0.4
+uvicorn==0.31.0
+elevenlabs==1.50.2
