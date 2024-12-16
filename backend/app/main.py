@@ -7,6 +7,14 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+
+app = FastAPI()
+
+# Mount the images directory to serve static files
+app.mount("/images", StaticFiles(directory="images"), name="images")
+
 # Add CORS middleware
 app.add_middleware(
        CORSMiddleware,

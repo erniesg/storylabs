@@ -13,6 +13,9 @@ import replicate
 from fastapi.responses import StreamingResponse
 from io import BytesIO
 from pathlib import Path
+import time
+
+
 logger = logging.getLogger(__name__)
 load_dotenv()
 router = APIRouter()
@@ -72,7 +75,7 @@ async def generate_image(request: ImageRequest):
         
         # Define the input for the model
         input_data = {
-            "prompt": request.prompt,
+            "prompt": f"{request.prompt} In the style of children's book illustrator, Richard Scarry.",
             "prompt_upsampling": False,
             "aspect_ratio": request.aspect_ratio,
             "output_format": request.output_format,
@@ -85,15 +88,18 @@ async def generate_image(request: ImageRequest):
             input=input_data
         )
         
-       # Read the file content
+        # Read the file content
         file_content = output.read()
         
-        # Return the file as a StreamingResponse
-        return StreamingResponse(
-            iter([file_content]),
-            media_type="image/png",
-            headers={"Content-Disposition": f"attachment; filename=image.png"}
-        )
+        # Save the image to a local file
+        file_path = f"images/{int(time.time())}.png"
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, "wb") as f:
+            f.write(file_content)
+
+        # Return the file path as JSON
+        return {"image_path": file_path}
+        
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -12,22 +12,34 @@ export interface Character {
 
 export interface StoryEvent {
   type: 'narrate' | 'speak' | 'input';
-  character?: Character;
+  character?: {
+    name: string;
+    prompt: string;
+    voice: string;
+    personality: {
+      trait: string;
+      goal: string;
+      speech_style: string;
+    };
+  };
   content: string;
   emotion?: string;
   id: string;
+  order: number;
 }
 
 export interface ParsedScene {
   id: string;
-  scene: string;
+  name: string;
+  prompt: string;
+  mood: string;
+  time: string;
+  imageUrl: string;
   events: StoryEvent[];
-  prompt: string; // Added prompt property
 }
-
 export class SceneParser {
   private characters: Map<string, Character> = new Map();
-
+  private scenes: Map<string, ParsedScene> = new Map();
   constructor(charactersMarkdown: string) {
     this.parseCharacters(charactersMarkdown);
   }
@@ -87,17 +99,26 @@ export class SceneParser {
   public parseScene(sceneData: any): ParsedScene {
     const events: StoryEvent[] = sceneData.events.map((event: any) => ({
       type: event.type,
-      character: this.characters.get(event.character?.name) || undefined,
-      content: event.content,
+      character: event.character ? {
+        name: event.character.name,
+        prompt: event.character.prompt,
+        voice: event.character.voice,
+        personality: event.character.personality,
+      } : undefined,
+      text: event.text,
       emotion: event.emotion || '',
       id: event.id,
+      order: event.order,
     }));
-
+  
     return {
       id: sceneData.id,
-      scene: sceneData.name,
+      name: sceneData.name,
+      prompt: sceneData.prompt,
+      mood: sceneData.mood,
+      time: sceneData.time,
+      imageUrl: sceneData.imageUrl,
       events,
-      prompt: sceneData.prompt, // Ensure prompt is included
     };
   }
 

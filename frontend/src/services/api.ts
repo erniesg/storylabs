@@ -24,8 +24,15 @@ export const generateStory = async (userInfo: {
     }
 
     const data = await response.json();
+
+    // Assuming data.scenes is an array of scenes with a 'prompt' field
+    const scenesWithImages = await Promise.all(data.story.scenes.map(async (scene: { prompt: string }) => {
+      const imageUrl = await fetchGeneratedImage(scene.prompt); // Changed from imageUrl to imagePath
+      return { ...scene, imageUrl }; // Updated to use imagePath
+    }));
+
     return {
-        story: data
+        story: { ...data, scenes: scenesWithImages }
     };
   } catch (error) {
     console.error('Error generating story:', error);
@@ -34,23 +41,24 @@ export const generateStory = async (userInfo: {
 };
 
 export async function fetchGeneratedImage(prompt: string): Promise<string> {
-    const response = await fetch(`${API_URL}/api/story/generate-image`, {
-        method: 'POST',
+  const response = await fetch(`${API_URL}/api/story/generate-image`, {
+      method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ prompt: prompt}),
-    });
-  
-    if (!response.ok) {
+      body: JSON.stringify({ prompt: prompt }),
+  });
+
+  if (!response.ok) {
       throw new Error('Failed to generate image');
-    }
-  
-    const blob = await response.blob();
-    //log this url
-    const imageUrl = URL.createObjectURL(blob);
-    console.log('Image URL:', imageUrl);
-    return imageUrl;
   }
+
+  // Assuming the server now returns a JSON object with the image path
+  const data = await response.json();
+  const imagePath = data.image_path; // Adjusted to expect a file path
+  const imageUrl = `${API_URL}/${imagePath}`;
+  console.log('Image URL:', imageUrl);
+  return imageUrl;      
+}
 
 

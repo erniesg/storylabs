@@ -53,7 +53,7 @@ export default function StoryInterface({ userInfo, story, generationError }: Sto
         const sceneContent = story.story.scenes.find(s => s.id === currentSceneId);
         if (!sceneContent) return;
 
-        const parser = new SceneParser(JSON.stringify(story.story.characters));
+        const parser = new SceneParser(JSON.stringify(story.story.scenes));
         const parsedScene = parser.parseScene(sceneContent);
         await seq.loadScene(parsedScene);
 
@@ -130,7 +130,11 @@ export default function StoryInterface({ userInfo, story, generationError }: Sto
       </div>
       <div className="relative h-80 mb-6">
         <AnimatePresence mode="wait">
-          <ImageComponent prompt={scene?.prompt || ''} />
+          <motion.img
+              src={scene?.imageUrl || ''}
+              alt={scene?.name || 'Scene Image'}
+              className="w-full h-full object-cover"
+            />
         </AnimatePresence>
       </div>
       <div className="text-lg text-gray-700 mb-6">
