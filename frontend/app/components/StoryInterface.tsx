@@ -11,6 +11,7 @@ import { audioService } from '@/lib/audio/AudioService'
 import { useStoryGeneration } from '@/hooks/useStoryGeneration'
 import { LoadingSpinner } from '@/app/components/LoadingSpinner'
 import ImageComponent from './ImageComponent' // Import the ImageComponent
+import { playAudio } from '@/src/services/api'
 
 interface StoryInterfaceProps {
   userInfo: {
@@ -23,20 +24,22 @@ interface StoryInterfaceProps {
 }
 
 export default function StoryInterface({ userInfo, story, generationError }: StoryInterfaceProps) {
-
+  console.log('StoryInterface props:', { userInfo, story, generationError });
   const [sequencer, setSequencer] = useState<StorySequencer | null>(null);
+  const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
   const [scene, setScene] = useState<ParsedScene | null>(null);
-  const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
 
-  const currentEvent = scene?.events[currentEventIndex];
-  const isAudioPlaying = sequencer?.getEventStatus(currentEvent?.id || '') === 'playing';
-  const currentSceneId = story?.story.main.flow[currentSceneIndex];
+  //const currentEvent = scene?.events[currentEventIndex];
+  //const isAudioPlaying = sequencer?.getEventStatus(currentEvent?.id || '') === 'playing';
+  const currentSceneId = story?.main.flow[currentSceneIndex];
+  const audioPlayedRef = useRef(false);
 
-  useEffect(() => {
+
+  /* useEffect(() => {
     if (!story || !currentSceneId) return;
 
     let mounted = true;
@@ -50,19 +53,22 @@ export default function StoryInterface({ userInfo, story, generationError }: Sto
           setSequencer(seq);
         }
 
-        const sceneContent = story.story.scenes.find(s => s.id === currentSceneId);
+        const sceneContent = story?.scenes.find(s => s.id === currentSceneId);
+        console.log(`sceneContent:`, sceneContent);
         if (!sceneContent) return;
 
-        const parser = new SceneParser(JSON.stringify(story.story.scenes));
+        const parser = new SceneParser(JSON.stringify(story.scenes));
+        console.log(`parser:`, parser);
         const parsedScene = parser.parseScene(sceneContent);
+        console.log(`parsedScene:`, parsedScene);
         await seq.loadScene(parsedScene);
 
         if (!mounted) return;
         setScene(parsedScene);
         setCurrentEventIndex(0);
 
-        await audioService.unlockAudio();
-        await seq.processNextEvent();
+        //await audioService.unlockAudio();
+        //await seq.processNextEvent();
       } catch (error) {
         console.error('Error loading scene:', error);
       }
@@ -72,41 +78,53 @@ export default function StoryInterface({ userInfo, story, generationError }: Sto
     return () => {
       mounted = false;
     };
-  }, [story, currentSceneId]);
+  }, [story, currentSceneId]); */
+
 
   useEffect(() => {
-    // ... Audio visualization code ...
-  }, [scene]);
+    if (story && story.scenes[currentSceneIndex]) {
+      const currentScene = story.scenes[currentSceneIndex];
+      const currentEvent = currentScene.events[currentEventIndex];
+  
+      if (!audioPlayedRef.current) {
+        playAudio(currentEvent.content);
+        audioPlayedRef.current = true; // Mark audio as played
+      }
+    }
+  }, [currentSceneIndex, currentEventIndex, story]);
 
   const goToNextScene = async () => {
-    if (currentSceneIndex < story!.story.main.flow.length - 1) {
+    if (currentSceneIndex < story!.main.flow.length - 1) {
       setCurrentSceneIndex(prev => prev + 1);
     }
-  };
-
-  const goToPreviousScene = async () => {
-    if (currentSceneIndex > 0) {
-      setCurrentSceneIndex(prev => prev - 1);
+    if (audioPlayedRef.current) {
+      audioPlayedRef.current = false;
     }
   };
 
-  const playCurrentEvent = async () => {
-    if (!sequencer || isAudioPlaying || !currentEvent) return;
-    await audioService.unlockAudio();
-    await sequencer.processNextEvent();
-  };
+  //const goToPreviousScene = async () => {
+  //  if (currentSceneIndex > 0) {
+  //    setCurrentSceneIndex(prev => prev - 1);
+  //  }
+  //};
 
-  const goToNextEvent = () => {
-    if (scene && currentEventIndex < scene.events.length - 1 && !isAudioPlaying) {
-      setCurrentEventIndex(prev => prev + 1);
-    }
-  };
+  //const playCurrentEvent = async () => {
+  //  if (!sequencer || isAudioPlaying || !currentEvent) return;
+  //  await audioService.unlockAudio();
+  //  await sequencer.processNextEvent();
+  //};
 
-  const goToPreviousEvent = () => {
-    if (currentEventIndex > 0 && !isAudioPlaying) {
-      setCurrentEventIndex(prev => prev - 1);
-    }
-  };
+  //const goToNextEvent = () => {
+  //  if (scene && currentEventIndex < scene.events.length - 1 && !isAudioPlaying) {
+  //    setCurrentEventIndex(prev => prev + 1);
+  //  }
+  //};
+
+  //const goToPreviousEvent = () => {
+  //  if (currentEventIndex > 0 && !isAudioPlaying) {
+  //    setCurrentEventIndex(prev => prev - 1);
+  //  }
+  //};
 
   if (generationError) {
     return (
@@ -117,67 +135,37 @@ export default function StoryInterface({ userInfo, story, generationError }: Sto
   }
 
   if (!story) return null;
-
+  //console.log(`story`, story.scenes[currentSceneIndex].events[currentEventIndex].content)
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold text-purple-800">
-          {story.story.main.title}
+          {story.main.title}
         </h2>
         <div className="text-sm text-gray-600">
-          Scene {currentSceneIndex + 1} of {story.story.main.flow.length}
+          Scene {currentSceneIndex + 1} of {story.main.flow.length}
         </div>
       </div>
       <div className="relative h-80 mb-6">
         <AnimatePresence mode="wait">
           <motion.img
-              src={scene?.imageUrl || ''}
-              alt={scene?.name || 'Scene Image'}
+              src={story?.scenes[currentSceneIndex].imageUrl || ''}
+              alt={story?.scenes[currentSceneIndex].name || 'Scene Image'}
               className="w-full h-full object-cover"
             />
         </AnimatePresence>
       </div>
       <div className="text-lg text-gray-700 mb-6">
-        {currentEvent?.content} {/* Display the event content */}
+        {story.scenes[currentSceneIndex].events[currentEventIndex].content} 
       </div>
       <div className="flex justify-between items-center gap-4">
         <div className="flex gap-2">
           <Button
-            onClick={goToPreviousScene}
-            disabled={currentSceneIndex === 0 || isAudioPlaying}
-            variant="outline"
-          >
-            Previous Scene
-          </Button>
-          <Button
             onClick={goToNextScene}
-            disabled={currentSceneIndex >= story.story.main.flow.length - 1 || isAudioPlaying}
+            //disabled={currentSceneIndex >= story.main.flow.length - 1 || isAudioPlaying}
             variant="outline"
           >
             Next Scene
-          </Button>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            onClick={goToPreviousEvent}
-            disabled={currentEventIndex === 0 || isAudioPlaying}
-            variant="outline"
-          >
-            Previous
-          </Button>
-          <Button
-            onClick={playCurrentEvent}
-            disabled={isAudioPlaying}
-            variant="default"
-          >
-            {isAudioPlaying ? 'Playing...' : 'Play'}
-          </Button>
-          <Button
-            onClick={goToNextEvent}
-            disabled={currentEventIndex >= scene?.events.length - 1 || isAudioPlaying}
-            variant="outline"
-          >
-            Next
           </Button>
         </div>
       </div>

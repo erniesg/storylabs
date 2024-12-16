@@ -29,6 +29,7 @@ export default function Home() {
       console.log('Story generated:', {story});
       // Update your state or perform other actions with the story
       setStory(story);
+      console.log('Story set:', {story});
       setStage('story');
     } catch (error) {
       console.error('Error generating story:', error);

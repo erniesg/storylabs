@@ -28,11 +28,12 @@ export const generateStory = async (userInfo: {
     // Assuming data.scenes is an array of scenes with a 'prompt' field
     const scenesWithImages = await Promise.all(data.story.scenes.map(async (scene: { prompt: string }) => {
       const imageUrl = await fetchGeneratedImage(scene.prompt); // Changed from imageUrl to imagePath
-      return { ...scene, imageUrl }; // Updated to use imagePath
+      return { ...scene, imageUrl }; // Updated to use imageUrl
     }));
+    console.log(`scenesWithImages: ${scenesWithImages}`);
 
     return {
-        story: { ...data, scenes: scenesWithImages }
+        story: { ...data.story, scenes: scenesWithImages }
     };
   } catch (error) {
     console.error('Error generating story:', error);
@@ -61,4 +62,25 @@ export async function fetchGeneratedImage(prompt: string): Promise<string> {
   return imageUrl;      
 }
 
+export async function playAudio(text: string) {
+  try {
+    const response = await fetch(`${API_URL}/api/story/generate-audio`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text: text }),
+    });
 
+    if (!response.ok) {
+      throw new Error('Failed to generate audio');
+    }
+
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioUrl);
+    audio.play();
+  } catch (error) {
+    console.error('Error playing audio:', error);
+  }
+}

@@ -23,7 +23,7 @@ export interface Story {
         prompt: string;
         mood: string;
         time: string;
-        imagePath: string;
+        imageUrl: string;
         events: Array<{
           type: 'narrate' | 'speak' | 'input';
           character?: {

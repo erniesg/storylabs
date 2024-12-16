@@ -41,7 +41,7 @@ export class StorySequencer {
     }
     console.log('Scene loaded, events initialized:', this.audioEvents.size);
     
-    await this.processNextEvent();
+    //await this.processNextEvent();
   }
 
   public async processNextEvent(): Promise<AudioEvent | null> {
@@ -68,8 +68,8 @@ export class StorySequencer {
     this.currentEventId = pendingEvent.id;
     const audioEvent = this.audioEvents.get(pendingEvent.id)!;
     audioEvent.status = 'playing';
-
-    try {
+    //
+    /* try {
       const response = await fetch(`${API_URL}/api/story/generate-audio`, {          
         method: 'POST',
         headers: {
@@ -98,7 +98,7 @@ export class StorySequencer {
       this.currentEventId = undefined;
       audioEvent.status = 'pending';
       return null;
-    }
+    } */
   }
 
   public getEventStatus(eventId: string): 'pending' | 'playing' | 'complete' | null {
