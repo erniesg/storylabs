@@ -1,26 +1,10 @@
-// frontend/src/services/api.ts
-
-// Add more detailed debugging
-console.log('Environment variables:', {
-  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-  NODE_ENV: process.env.NODE_ENV,
-  all_env: process.env
-});
-
-// Add environment debugging
-console.log('Environment Check:', {
-  NODE_ENV: process.env.NODE_ENV,
-  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-  isDevelopment: process.env.NODE_ENV === 'development',
-  isProduction: process.env.NODE_ENV === 'production'
-});
-
-// Use environment-aware API URL
+// Directly set API URL based on environment
 export const API_URL = process.env.NODE_ENV === 'production'
-  ? process.env.NEXT_PUBLIC_API_URL
-  : 'http://localhost:8000';
+  ? 'https://storylabs-api.onrender.com'  // Production URL
+  : 'http://localhost:8000';              // Development URL
 
-console.log('Selected API_URL:', API_URL);
+console.log('Environment:', process.env.NODE_ENV);
+console.log('Using API_URL:', API_URL);
 
 export const generateStory = async (userInfo: {
   name: string;
