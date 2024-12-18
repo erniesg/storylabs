@@ -19,12 +19,11 @@ services:
     name: storylabs
     env: docker
     dockerfilePath: ./frontend/Dockerfile
+    dependsOn: 
+      - storylabs-api
     envVars:
       - key: PORT
         value: 3000
       # This will automatically point to your backend
       - key: NEXT_PUBLIC_API_URL
         value: https://storylabs-api.onrender.com
-
-    dependsOn:
-      - storylabs-api
