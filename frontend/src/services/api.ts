@@ -1,8 +1,26 @@
 // frontend/src/services/api.ts
 
-// Update this line to use environment variable
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-console.log('API_URL:', API_URL);
+// Add more detailed debugging
+console.log('Environment variables:', {
+  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  NODE_ENV: process.env.NODE_ENV,
+  all_env: process.env
+});
+
+// Add environment debugging
+console.log('Environment Check:', {
+  NODE_ENV: process.env.NODE_ENV,
+  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  isDevelopment: process.env.NODE_ENV === 'development',
+  isProduction: process.env.NODE_ENV === 'production'
+});
+
+// Use environment-aware API URL
+export const API_URL = process.env.NODE_ENV === 'production'
+  ? process.env.NEXT_PUBLIC_API_URL
+  : 'http://localhost:8000';
+
+console.log('Selected API_URL:', API_URL);
 
 export const generateStory = async (userInfo: {
   name: string;
