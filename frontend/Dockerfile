@@ -13,4 +13,4 @@ RUN npm run build
 ENV PORT=3000
 EXPOSE ${PORT}
 
-CMD ["sh", "-c", "next start -p $PORT"]
+CMD ["sh", "-c", "npx next start -p $PORT"]
