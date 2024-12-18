@@ -1,0 +1,30 @@
+services:
+  # Backend Service
+  - type: web
+    name: storylabs-api
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: REPLICATE_API_TOKEN
+        sync: false
+      - key: PORT
+        value: 8000
+
+  # Frontend Service
+  - type: web
+    name: storylabs
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    envVars:
+      - key: PORT
+        value: 3000
+      # This will automatically point to your backend
+      - key: NEXT_PUBLIC_API_URL
+        value: https://storylabs-api.onrender.com
+
+    dependsOn:
+      - storylabs-api

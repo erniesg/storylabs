@@ -124,7 +124,7 @@ async def generate_audio(request: AudioRequest):
     try:
         # Generate the audio
         audio_generator = client.text_to_speech.convert(
-            voice_id="iUqOXhMfiOIbBejNtfLR",
+            voice_id="cgSgspJ2msm6clMCkdW9",
             output_format="mp3_44100_128",
             text=request.text,
             model_id="eleven_multilingual_v2",
