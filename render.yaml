@@ -25,7 +25,7 @@ services:
     env: docker
     rootDir: frontend
     dockerfilePath: Dockerfile
-    plan: free  # Add this line
+    plan: free
     envVars:
       - key: PORT
         value: 3000

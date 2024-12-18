@@ -1,5 +1,7 @@
 // frontend/src/services/api.ts
-export const API_URL = 'http://127.0.0.1:8000';
+
+// Update this line to use environment variable
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export const generateStory = async (userInfo: {
   name: string;

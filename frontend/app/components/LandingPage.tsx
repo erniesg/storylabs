@@ -24,7 +24,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
         transition={{ delay: 0.5, duration: 0.5 }}
         className="text-2xl text-white mb-12"
       >
-        An interactive reading adventure for preschoolers!
+        An interactive reading adventure for children!
       </motion.p>
       <AudioWaveform />
       <Button
