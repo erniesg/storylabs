@@ -2,6 +2,7 @@
 
 // Update this line to use environment variable
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+console.log('API_URL:', API_URL);
 
 export const generateStory = async (userInfo: {
   name: string;
