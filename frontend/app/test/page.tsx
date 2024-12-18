@@ -27,6 +27,8 @@ export default function TestPage() {
           age: "7",
           interests: "space,science"
         }}
+        story={null}
+        generationError={null}
       />
     </div>
   );
