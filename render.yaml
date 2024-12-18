@@ -5,6 +5,7 @@ services:
     env: docker
     rootDir: backend
     dockerfilePath: Dockerfile
+    plan: free  # Add this line
     envVars:
       - key: OPENAI_API_KEY
         sync: false
@@ -24,6 +25,7 @@ services:
     env: docker
     rootDir: frontend
     dockerfilePath: Dockerfile
+    plan: free  # Add this line
     envVars:
       - key: PORT
         value: 3000
