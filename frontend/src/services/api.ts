@@ -7,14 +7,28 @@ console.log('Environment:', process.env.NODE_ENV);
 console.log('Using API_URL:', API_URL);
 
 export const getStoredKeys = () => {
-  const keys = localStorage.getItem('storylabs_keys');
-  return keys ? JSON.parse(keys) : null;
+  try {
+    const keys = localStorage.getItem('storylabs_keys');
+    if (!keys) return null;
+    const parsedKeys = JSON.parse(keys);
+    console.log('Retrieved stored keys:', parsedKeys);
+    return parsedKeys;
+  } catch (error) {
+    console.error('Error getting stored keys:', error);
+    // Clear potentially corrupted data
+    localStorage.removeItem('storylabs_keys');
+    return null;
+  }
 };
 
 // Add error handling for API key validation
 const validateApiResponse = async (response: Response) => {
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
+    if (response.status === 403) {
+      // Clear stored keys if authentication fails
+      localStorage.removeItem('storylabs_keys');
+    }
     throw new Error(error.detail || 'Request failed');
   }
   return response;

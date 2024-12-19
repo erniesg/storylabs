@@ -21,6 +21,18 @@ export default function LandingPage({ onStart }: LandingPageProps) {
   const [useAccessCode, setUseAccessCode] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const storedKeys = localStorage.getItem('storylabs_keys');
+    if (storedKeys) {
+      const parsedKeys = JSON.parse(storedKeys);
+      setApiKeys(parsedKeys);
+      console.log('Loaded stored keys:', parsedKeys);
+    }
+  }, []);
+
+  console.log('Access code from env:', process.env.NEXT_PUBLIC_ACCESS_CODE);
+  console.log('Current validation state:', isValid);
+
   const isValid = useAccessCode 
     ? apiKeys.accessCode === process.env.NEXT_PUBLIC_ACCESS_CODE
     : (!!apiKeys.openaiKey && !!apiKeys.elevenLabsKey && !!apiKeys.replicateToken);
@@ -31,6 +43,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
     if (useAccessCode) {
       if (apiKeys.accessCode !== process.env.NEXT_PUBLIC_ACCESS_CODE) {
         setError('Invalid access code');
+        localStorage.removeItem('storylabs_keys');
         return;
       }
     } else {
