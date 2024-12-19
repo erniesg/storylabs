@@ -30,12 +30,12 @@ export default function LandingPage({ onStart }: LandingPageProps) {
     }
   }, []);
 
-  console.log('Access code from env:', process.env.NEXT_PUBLIC_ACCESS_CODE);
-  console.log('Current validation state:', isValid);
-
   const isValid = useAccessCode 
     ? apiKeys.accessCode === process.env.NEXT_PUBLIC_ACCESS_CODE
     : (!!apiKeys.openaiKey && !!apiKeys.elevenLabsKey && !!apiKeys.replicateToken);
+
+  console.log('Access code from env:', process.env.NEXT_PUBLIC_ACCESS_CODE);
+  console.log('Current validation state:', isValid);
 
   const handleSubmit = () => {
     setError(null);
