@@ -38,8 +38,9 @@ def validate_credentials(
     logger.info("Validating credentials...")
     logger.info(f"Received headers: X-Access-Code: {'Present' if x_access_code else 'Not present'}")
     
-    env_access_code = os.getenv("ACCESS_CODE")
+    env_access_code = os.environ.get("ACCESS_CODE")
     logger.info(f"System access code status: {'Present' if env_access_code else 'Not present'}")
+    logger.info(f"All environment variables: {list(os.environ.keys())}")  # Add this for debugging
     
     if x_access_code:
         logger.info(f"Comparing access codes (last 3 chars): Received ...{x_access_code[-3:]} vs System ...{env_access_code[-3:] if env_access_code else 'NONE'}")
