@@ -6,16 +6,39 @@ export const API_URL = process.env.NODE_ENV === 'production'
 console.log('Environment:', process.env.NODE_ENV);
 console.log('Using API_URL:', API_URL);
 
+const getStoredKeys = () => {
+  const keys = localStorage.getItem('storylabs_keys');
+  return keys ? JSON.parse(keys) : null;
+};
+
+// Add error handling for API key validation
+const validateApiResponse = async (response: Response) => {
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
+    throw new Error(error.detail || 'Request failed');
+  }
+  return response;
+};
+
 export const generateStory = async (userInfo: {
   name: string;
   age: string;
   interests: string;
 }) => {
+  const keys = getStoredKeys();
+  if (!keys) {
+    throw new Error('No credentials found');
+  }
+
   try {
     const response = await fetch(`${API_URL}/api/story/generate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(keys.accessCode && { 'X-Access-Code': keys.accessCode }),
+        ...(keys.openaiKey && { 'X-OpenAI-Key': keys.openaiKey }),
+        ...(keys.elevenLabsKey && { 'X-ElevenLabs-Key': keys.elevenLabsKey }),
+        ...(keys.replicateToken && { 'X-Replicate-Token': keys.replicateToken }),
       },
       body: JSON.stringify({
         child_name: userInfo.name,
@@ -24,21 +47,17 @@ export const generateStory = async (userInfo: {
       })
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to generate story');
-    }
-
+    await validateApiResponse(response);
     const data = await response.json();
 
-    // Assuming data.scenes is an array of scenes with a 'prompt' field
+    // Pass the stored keys to image generation
     const scenesWithImages = await Promise.all(data.story.scenes.map(async (scene: { prompt: string }) => {
-      const imageUrl = await fetchGeneratedImage(scene.prompt); // Changed from imageUrl to imagePath
-      return { ...scene, imageUrl }; // Updated to use imageUrl
+      const imageUrl = await fetchGeneratedImage(scene.prompt, keys);
+      return { ...scene, imageUrl };
     }));
-    console.log(`scenesWithImages: ${scenesWithImages}`);
 
     return {
-        story: { ...data.story, scenes: scenesWithImages }
+      story: { ...data.story, scenes: scenesWithImages }
     };
   } catch (error) {
     console.error('Error generating story:', error);
@@ -46,33 +65,44 @@ export const generateStory = async (userInfo: {
   }
 };
 
-export async function fetchGeneratedImage(prompt: string): Promise<string> {
+export async function fetchGeneratedImage(prompt: string, keys: any): Promise<string> {
   const response = await fetch(`${API_URL}/api/story/generate-image`, {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ prompt: prompt }),
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(keys.accessCode && { 'X-Access-Code': keys.accessCode }),
+      ...(keys.openaiKey && { 'X-OpenAI-Key': keys.openaiKey }),
+      ...(keys.elevenLabsKey && { 'X-ElevenLabs-Key': keys.elevenLabsKey }),
+      ...(keys.replicateToken && { 'X-Replicate-Token': keys.replicateToken }),
+    },
+    body: JSON.stringify({ prompt: prompt }),
   });
 
   if (!response.ok) {
-      throw new Error('Failed to generate image');
+    throw new Error('Failed to generate image');
   }
 
-  // Assuming the server now returns a JSON object with the image path
   const data = await response.json();
-  const imagePath = data.image_path; // Adjusted to expect a file path
+  const imagePath = data.image_path;
   const imageUrl = `${API_URL}/${imagePath}`;
-  console.log('Image URL:', imageUrl);
   return imageUrl;      
 }
 
 export async function playAudio(text: string) {
+  const keys = getStoredKeys();
+  if (!keys) {
+    throw new Error('No credentials found');
+  }
+
   try {
     const response = await fetch(`${API_URL}/api/story/generate-audio`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(keys.accessCode && { 'X-Access-Code': keys.accessCode }),
+        ...(keys.openaiKey && { 'X-OpenAI-Key': keys.openaiKey }),
+        ...(keys.elevenLabsKey && { 'X-ElevenLabs-Key': keys.elevenLabsKey }),
+        ...(keys.replicateToken && { 'X-Replicate-Token': keys.replicateToken }),
       },
       body: JSON.stringify({ text: text }),
     });

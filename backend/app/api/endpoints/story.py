@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Header, Depends
 from pydantic import BaseModel
 from openai import OpenAI
 from elevenlabs import ElevenLabs
@@ -14,6 +14,7 @@ from fastapi.responses import StreamingResponse
 from io import BytesIO
 from pathlib import Path
 import time
+from typing import Optional
 
 
 logger = logging.getLogger(__name__)
@@ -27,10 +28,52 @@ class StoryRequest(BaseModel):
 
 #read in the config.py
 
+# Add a function to validate and log credentials
+def validate_credentials(
+    x_access_code: Optional[str] = Header(None),
+    x_openai_key: Optional[str] = Header(None),
+    x_elevenlabs_key: Optional[str] = Header(None),
+    x_replicate_token: Optional[str] = Header(None)
+):
+    env_access_code = os.getenv("ACCESS_CODE")
+    
+    # If access code is provided, verify it
+    if x_access_code:
+        if x_access_code != env_access_code:
+            logger.error(f"Invalid access code provided")
+            raise HTTPException(status_code=403, detail="Invalid access code")
+        # logger.info(f"Using access code (last 3 digits: ...{x_access_code[-3:]})")
+        # logger.info("Using environment API keys")
+        return {
+            "openai_key": os.getenv("OPENAI_API_KEY"),
+            "elevenlabs_key": os.getenv("ELEVENLABS_API_KEY"),
+            "replicate_token": os.getenv("REPLICATE_API_TOKEN")
+        }
+    
+    # If no access code, require all API keys
+    if not all([x_openai_key, x_elevenlabs_key, x_replicate_token]):
+        logger.error("Missing required API keys")
+        raise HTTPException(status_code=403, detail="Must provide either access code or all API keys")
+    
+    # Log the last 3 digits of provided API keys
+    # logger.info("Using provided API keys:")
+    # logger.info(f"OpenAI key ending in: ...{x_openai_key[-3:]}")
+    # logger.info(f"ElevenLabs key ending in: ...{x_elevenlabs_key[-3:]}")
+    # logger.info(f"Replicate token ending in: ...{x_replicate_token[-3:]}")
+    
+    return {
+        "openai_key": x_openai_key,
+        "elevenlabs_key": x_elevenlabs_key,
+        "replicate_token": x_replicate_token
+    }
+
 @router.post("/generate")
-async def generate_story(request: StoryRequest):
+async def generate_story(
+    request: StoryRequest,
+    credentials: dict = Depends(validate_credentials)
+):
     try:
-        client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+        client = OpenAI(api_key=credentials["openai_key"])
         # Load the generator prompt
         with open('app/storybuilder/prompts/generator.txt', 'r') as file:
             md_generator_prompt = file.read()
@@ -68,10 +111,16 @@ class ImageRequest(BaseModel):
     seed: int = 123457
 
 @router.post("/generate-image")
-async def generate_image(request: ImageRequest):
+async def generate_image(
+    request: ImageRequest,
+    credentials: dict = Depends(validate_credentials)
+):
     try:
-        # Initialize the Replicate client
-        replicate_client = replicate.Client(api_token=os.environ["REPLICATE_API_TOKEN"])
+        # Log which Replicate token is being used
+        token = credentials["replicate_token"]
+        logger.info(f"Generating image using Replicate token ending in ...{token[-3:]}")
+        
+        replicate_client = replicate.Client(api_token=token)
         
         # Define the input for the model
         input_data = {
@@ -120,8 +169,17 @@ def save_audio_from_generator(generator):
     return audio_stream
 
 @router.post("/generate-audio")
-async def generate_audio(request: AudioRequest):
+async def generate_audio(
+    request: AudioRequest,
+    credentials: dict = Depends(validate_credentials)
+):
     try:
+        # Log which ElevenLabs key is being used
+        key = credentials["elevenlabs_key"]
+        logger.info(f"Generating audio using ElevenLabs key ending in ...{key[-3:]}")
+        
+        client = ElevenLabs(api_key=key)
+        
         # Generate the audio
         audio_generator = client.text_to_speech.convert(
             voice_id="cgSgspJ2msm6clMCkdW9",

@@ -12,6 +12,7 @@ import { useStoryGeneration } from '@/hooks/useStoryGeneration'
 import { LoadingSpinner } from '@/app/components/LoadingSpinner'
 import ImageComponent from './ImageComponent' // Import the ImageComponent
 import { playAudio } from '@/src/services/api'
+import { ChevronRight } from 'lucide-react'
 
 interface StoryInterfaceProps {
   userInfo: {
@@ -162,10 +163,10 @@ export default function StoryInterface({ userInfo, story, generationError }: Sto
         <div className="flex gap-2">
           <Button
             onClick={goToNextScene}
-            //disabled={currentSceneIndex >= story.main.flow.length - 1 || isAudioPlaying}
-            variant="outline"
+            className="text-lg py-2 px-6 bg-yellow-400 hover:bg-yellow-500 text-purple-800 font-bold rounded-full transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center gap-2"
           >
             Next Scene
+            <ChevronRight className="w-5 h-5" />
           </Button>
         </div>
       </div>
