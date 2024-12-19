@@ -178,23 +178,23 @@ export default function LandingPage({ onStart }: LandingPageProps) {
         </div>
       </motion.div>
 
-      <AudioWaveform />
-      
-      {error && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-red-500 mt-4 font-semibold"
-        >
-          {error}
-        </motion.div>
-      )}
-
-      <motion.div className="text-white/70 text-sm mt-4">
+      <motion.div className="text-white/70 text-sm mt-8 mb-8">
         {useAccessCode 
           ? "Enter access code to use our API keys"
           : "Provide your own API keys for OpenAI, ElevenLabs, and Replicate"}
       </motion.div>
+
+      <AudioWaveform />
+
+      {error && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-red-500 mt-8 font-semibold"
+        >
+          {error}
+        </motion.div>
+      )}
 
       <Button
         onClick={handleSubmit}
