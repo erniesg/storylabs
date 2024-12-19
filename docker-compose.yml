@@ -11,6 +11,7 @@ services:
       - ./backend:/app
     environment:
       - ENVIRONMENT=production
+      - ACCESS_CODE=${ACCESS_CODE}  # Changed from NEXT_PUBLIC_ACCESS_CODE
     networks:
       - app-network
 

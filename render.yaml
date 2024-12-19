@@ -13,6 +13,8 @@ services:
         sync: false
       - key: REPLICATE_API_TOKEN
         sync: false
+      - key: ACCESS_CODE
+        sync: false
       - key: PORT
         value: 8000
     buildFilter:

@@ -36,14 +36,16 @@ def validate_credentials(
     x_replicate_token: Optional[str] = Header(None)
 ):
     env_access_code = os.getenv("ACCESS_CODE")
+    logger.info(f"System access code ends with: ...{env_access_code[-3:] if env_access_code else 'NOT_SET'}")
     
     # If access code is provided, verify it
     if x_access_code:
+        logger.info(f"Received access code ending with: ...{x_access_code[-3:]}")
         if x_access_code != env_access_code:
-            logger.error(f"Invalid access code provided")
+            logger.error("Invalid access code provided")
             raise HTTPException(status_code=403, detail="Invalid access code")
-        # logger.info(f"Using access code (last 3 digits: ...{x_access_code[-3:]})")
-        # logger.info("Using environment API keys")
+        
+        # Use system API keys when access code is valid
         return {
             "openai_key": os.getenv("OPENAI_API_KEY"),
             "elevenlabs_key": os.getenv("ELEVENLABS_API_KEY"),
@@ -55,11 +57,11 @@ def validate_credentials(
         logger.error("Missing required API keys")
         raise HTTPException(status_code=403, detail="Must provide either access code or all API keys")
     
-    # Log the last 3 digits of provided API keys
-    # logger.info("Using provided API keys:")
-    # logger.info(f"OpenAI key ending in: ...{x_openai_key[-3:]}")
-    # logger.info(f"ElevenLabs key ending in: ...{x_elevenlabs_key[-3:]}")
-    # logger.info(f"Replicate token ending in: ...{x_replicate_token[-3:]}")
+    # Use provided API keys
+    logger.info("Using provided API keys:")
+    logger.info(f"OpenAI key ending in: ...{x_openai_key[-3:]}")
+    logger.info(f"ElevenLabs key ending in: ...{x_elevenlabs_key[-3:]}")
+    logger.info(f"Replicate token ending in: ...{x_replicate_token[-3:]}")
     
     return {
         "openai_key": x_openai_key,

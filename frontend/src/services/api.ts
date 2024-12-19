@@ -44,6 +44,14 @@ export const generateStory = async (userInfo: {
     throw new Error('No credentials found');
   }
 
+  // Add debug logging
+  console.log('Sending request with headers:', {
+    ...(keys.accessCode && { 'X-Access-Code': keys.accessCode }),
+    ...(keys.openaiKey && { 'X-OpenAI-Key': keys.openaiKey }),
+    ...(keys.elevenLabsKey && { 'X-ElevenLabs-Key': keys.elevenLabsKey }),
+    ...(keys.replicateToken && { 'X-Replicate-Token': keys.replicateToken }),
+  });
+
   try {
     const response = await fetch(`${API_URL}/api/story/generate`, {
       method: 'POST',
