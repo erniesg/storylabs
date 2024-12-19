@@ -6,7 +6,7 @@ export const API_URL = process.env.NODE_ENV === 'production'
 console.log('Environment:', process.env.NODE_ENV);
 console.log('Using API_URL:', API_URL);
 
-const getStoredKeys = () => {
+export const getStoredKeys = () => {
   const keys = localStorage.getItem('storylabs_keys');
   return keys ? JSON.parse(keys) : null;
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchGeneratedImage } from '@/src/services/api';
+import { fetchGeneratedImage, getStoredKeys } from '@/src/services/api';
 
 interface ImageComponentProps {
   prompt: string;
@@ -13,7 +13,11 @@ const ImageComponent: React.FC<ImageComponentProps> = ({ prompt }) => {
 
     const getImage = async () => {
       try {
-        const url = await fetchGeneratedImage(prompt);
+        const keys = getStoredKeys();
+        if (!keys) {
+          throw new Error('No credentials found');
+        }
+        const url = await fetchGeneratedImage(prompt, keys);
         if (isMounted) {
           setImageUrl(url);
         }
