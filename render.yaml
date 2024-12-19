@@ -5,7 +5,7 @@ services:
     env: docker
     rootDir: backend
     dockerfilePath: Dockerfile
-    plan: free  # Add this line
+    plan: free
     envVars:
       - key: OPENAI_API_KEY
         sync: false
@@ -31,6 +31,8 @@ services:
         value: 3000
       - key: NEXT_PUBLIC_API_URL
         value: https://storylabs-api.onrender.com
+      - key: NEXT_PUBLIC_ACCESS_CODE
+        sync: false
     buildFilter:
       paths:
         - frontend/**

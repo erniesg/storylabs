@@ -10,7 +10,7 @@ services:
     volumes:
       - ./backend:/app
     environment:
-      - ENVIRONMENT=development
+      - ENVIRONMENT=production
     networks:
       - app-network
 
@@ -18,6 +18,9 @@ services:
     build: 
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_ACCESS_CODE=${NEXT_PUBLIC_ACCESS_CODE}
+        - NEXT_PUBLIC_API_URL=http://localhost:8000
     ports:
       - "3000:3000"
     volumes:
@@ -25,6 +28,7 @@ services:
       - /app/node_modules
       - /app/.next
     environment:
+      - NEXT_PUBLIC_ACCESS_CODE=${NEXT_PUBLIC_ACCESS_CODE}
       - NEXT_PUBLIC_API_URL=http://localhost:8000
     depends_on:
       - backend
