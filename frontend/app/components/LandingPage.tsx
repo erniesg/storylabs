@@ -10,10 +10,18 @@ interface LandingPageProps {
 export default function LandingPage({ onStart }: LandingPageProps) {
   return (
     <div className="text-center w-full h-screen flex flex-col items-center justify-center">
-      <motion.h1
+      <motion.img
+        src="/storylabs.png"
+        alt="StoryLabs Logo"
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
+        className="w-32 mb-4"
+      />
+      <motion.h1
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
         className="text-6xl font-bold text-white mb-8"
       >
         StoryLabs

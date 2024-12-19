@@ -1,10 +1,14 @@
 FROM node:20-alpine
 
+RUN npm config set fetch-retry-maxtimeout 600000 \
+    && npm config set fetch-retry-mintimeout 10000 \
+    && npm config set fetch-retries 5
+
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --network-timeout=100000 --registry=https://registry.npmjs.org/
 
 COPY . .
 
@@ -14,5 +18,4 @@ ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
 EXPOSE ${PORT}
 
-# Development command instead of building
 CMD ["npm", "run", "dev"]

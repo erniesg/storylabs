@@ -2,7 +2,7 @@ import './globals.css'
 
 export const metadata = {
   title: 'StoryLabs',
-  description: 'An interactive reading adventure for preschoolers',
+  description: 'An interactive reading adventure for children',
 }
 
 export default function RootLayout({
