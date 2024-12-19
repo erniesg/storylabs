@@ -26,7 +26,12 @@ export default function LandingPage({ onStart }: LandingPageProps) {
     if (storedKeys) {
       const parsedKeys = JSON.parse(storedKeys);
       setApiKeys(parsedKeys);
-      console.log('Loaded stored keys:', parsedKeys);
+      console.log('Loaded stored keys:', {
+        accessCode: parsedKeys.accessCode ? 'Present' : 'Not present',
+        openaiKey: parsedKeys.openaiKey ? 'Present' : 'Not present',
+        elevenLabsKey: parsedKeys.elevenLabsKey ? 'Present' : 'Not present',
+        replicateToken: parsedKeys.replicateToken ? 'Present' : 'Not present'
+      });
     }
   }, []);
 
@@ -34,7 +39,6 @@ export default function LandingPage({ onStart }: LandingPageProps) {
     ? apiKeys.accessCode === process.env.NEXT_PUBLIC_ACCESS_CODE
     : (!!apiKeys.openaiKey && !!apiKeys.elevenLabsKey && !!apiKeys.replicateToken);
 
-  console.log('Access code from env:', process.env.NEXT_PUBLIC_ACCESS_CODE);
   console.log('Current validation state:', isValid);
 
   const handleSubmit = () => {

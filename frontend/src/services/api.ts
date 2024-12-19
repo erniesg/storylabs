@@ -11,11 +11,15 @@ export const getStoredKeys = () => {
     const keys = localStorage.getItem('storylabs_keys');
     if (!keys) return null;
     const parsedKeys = JSON.parse(keys);
-    console.log('Retrieved stored keys:', parsedKeys);
+    console.log('Retrieved stored keys:', {
+      accessCode: parsedKeys.accessCode ? 'Present' : 'Not present',
+      openaiKey: parsedKeys.openaiKey ? 'Present' : 'Not present',
+      elevenLabsKey: parsedKeys.elevenLabsKey ? 'Present' : 'Not present',
+      replicateToken: parsedKeys.replicateToken ? 'Present' : 'Not present'
+    });
     return parsedKeys;
   } catch (error) {
     console.error('Error getting stored keys:', error);
-    // Clear potentially corrupted data
     localStorage.removeItem('storylabs_keys');
     return null;
   }
