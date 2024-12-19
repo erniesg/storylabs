@@ -40,26 +40,29 @@ def validate_credentials(
     
     env_access_code = os.environ.get("ACCESS_CODE")
     logger.info(f"System access code status: {'Present' if env_access_code else 'Not present'}")
-    logger.info(f"All environment variables: {list(os.environ.keys())}")  # Add this for debugging
+    logger.info(f"All environment variables: {list(os.environ.keys())}")
     
+    # If access code is provided and valid, use system API keys
     if x_access_code:
         logger.info(f"Comparing access codes (last 3 chars): Received ...{x_access_code[-3:]} vs System ...{env_access_code[-3:] if env_access_code else 'NONE'}")
-        if x_access_code != env_access_code:
+        if x_access_code == env_access_code:
+            logger.info("Access code validated successfully! Using system API keys")
+            return {
+                "openai_key": os.environ.get("OPENAI_API_KEY"),
+                "elevenlabs_key": os.environ.get("ELEVENLABS_API_KEY"),
+                "replicate_token": os.environ.get("REPLICATE_API_TOKEN")
+            }
+        else:
             logger.error("Access code mismatch!")
             raise HTTPException(status_code=403, detail="Invalid access code")
-        logger.info("Access code validated successfully!")
     
-    # If no access code, require all API keys
+    # If no access code, check for user-provided API keys
     if not all([x_openai_key, x_elevenlabs_key, x_replicate_token]):
         logger.error("Missing required API keys")
-        raise HTTPException(status_code=403, detail="Must provide either access code or all API keys")
+        raise HTTPException(status_code=403, detail="Must provide either valid access code or all API keys")
     
-    # Use provided API keys
-    logger.info("Using provided API keys:")
-    logger.info(f"OpenAI key ending in: ...{x_openai_key[-3:]}")
-    logger.info(f"ElevenLabs key ending in: ...{x_elevenlabs_key[-3:]}")
-    logger.info(f"Replicate token ending in: ...{x_replicate_token[-3:]}")
-    
+    # Use user-provided API keys
+    logger.info("Using user-provided API keys")
     return {
         "openai_key": x_openai_key,
         "elevenlabs_key": x_elevenlabs_key,
