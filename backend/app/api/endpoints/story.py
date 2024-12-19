@@ -35,22 +35,18 @@ def validate_credentials(
     x_elevenlabs_key: Optional[str] = Header(None),
     x_replicate_token: Optional[str] = Header(None)
 ):
-    env_access_code = os.getenv("ACCESS_CODE")
-    logger.info(f"System access code ends with: ...{env_access_code[-3:] if env_access_code else 'NOT_SET'}")
+    logger.info("Validating credentials...")
+    logger.info(f"Received headers: X-Access-Code: {'Present' if x_access_code else 'Not present'}")
     
-    # If access code is provided, verify it
+    env_access_code = os.getenv("ACCESS_CODE")
+    logger.info(f"System access code status: {'Present' if env_access_code else 'Not present'}")
+    
     if x_access_code:
-        logger.info(f"Received access code ending with: ...{x_access_code[-3:]}")
+        logger.info(f"Comparing access codes (last 3 chars): Received ...{x_access_code[-3:]} vs System ...{env_access_code[-3:] if env_access_code else 'NONE'}")
         if x_access_code != env_access_code:
-            logger.error("Invalid access code provided")
+            logger.error("Access code mismatch!")
             raise HTTPException(status_code=403, detail="Invalid access code")
-        
-        # Use system API keys when access code is valid
-        return {
-            "openai_key": os.getenv("OPENAI_API_KEY"),
-            "elevenlabs_key": os.getenv("ELEVENLABS_API_KEY"),
-            "replicate_token": os.getenv("REPLICATE_API_TOKEN")
-        }
+        logger.info("Access code validated successfully!")
     
     # If no access code, require all API keys
     if not all([x_openai_key, x_elevenlabs_key, x_replicate_token]):

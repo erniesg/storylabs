@@ -30,9 +30,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
-async def startup_event():
-    logger.info("Starting FastAPI application...")
+# Add CORS middleware with logging
+@app.middleware("http")
+async def log_requests(request, call_next):
+    logger.info(f"Incoming request: {request.method} {request.url}")
+    logger.info(f"Headers: {request.headers}")
+    response = await call_next(request)
+    logger.info(f"Response status: {response.status_code}")
+    return response
 
 # Include routers
 app.include_router(story.router, prefix="/api/story", tags=["story"])
+
+@app.on_event("startup")
+async def startup_event():
+    logger.info("Starting FastAPI application...")
+    # Log environment check (only last 3 chars for security)
+    access_code = os.getenv("ACCESS_CODE")
+    logger.info(f"ACCESS_CODE environment variable is {'SET (ends with ...' + access_code[-3:] + ')' if access_code else 'NOT SET'}")
