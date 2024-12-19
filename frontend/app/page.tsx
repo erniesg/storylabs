@@ -49,7 +49,7 @@ export default function Home() {
         <>
           <div className="flex items-center justify-center h-96">
             <LoadingSpinner />
-            <p className="ml-2 text-white">Generating your story. This should take less than a minute ...</p>
+            <p className="ml-2 text-white">Generating your story. This should take less than a minute...</p>
           </div>
         </>
       )}

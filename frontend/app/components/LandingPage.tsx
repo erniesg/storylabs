@@ -86,10 +86,18 @@ export default function LandingPage({ onStart }: LandingPageProps) {
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="text-6xl font-bold text-white mb-8"
+        className="text-6xl font-bold text-white mb-2"
       >
         StoryLabs
       </motion.h1>
+      <motion.p
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="text-xl text-white/80 mb-8 italic"
+      >
+        An interactive reading adventure for children
+      </motion.p>
       
       <motion.div 
         initial={{ opacity: 0 }}
