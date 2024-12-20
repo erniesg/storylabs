@@ -7,9 +7,13 @@ class Personality(BaseModel):
     goal: str
     speech_style: str
 
+class WordLearned(BaseModel):
+    word: str
+    definition: str
+    usage: str
+
 class Character(BaseModel):
     name: str
-    prompt: str
     voice: Literal["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
     personality: Personality
 
@@ -19,8 +23,6 @@ class StoryEvent(BaseModel):
     voice: Literal["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
     emotion: str
     content: str
-    id: str
-    order: int
 
 class Scene(BaseModel):
     name: str
@@ -31,7 +33,7 @@ class Scene(BaseModel):
     events: List[StoryEvent]
 
 class GlobalState(BaseModel):
-    words_learned: List[str]
+    words_learned: List[WordLearned]
 
 class StoryState(BaseModel):
     global_state: GlobalState
