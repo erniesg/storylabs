@@ -14,7 +14,7 @@ from fastapi.responses import StreamingResponse
 from io import BytesIO
 from pathlib import Path
 import time
-from typing import Optional
+from typing import Optional, Literal
 
 
 logger = logging.getLogger(__name__)
@@ -162,6 +162,8 @@ client = ElevenLabs(
 
 class AudioRequest(BaseModel):
     text: str
+    provider: Literal["openai", "elevenlabs"] = "elevenlabs"  # Default to elevenlabs
+    voice: Optional[str] = None  # For OpenAI voices (alloy, echo, etc.)
 
 def save_audio_from_generator(generator):
     audio_stream = BytesIO()
@@ -176,28 +178,37 @@ async def generate_audio(
     credentials: dict = Depends(validate_credentials)
 ):
     try:
-        # Log which ElevenLabs key is being used
-        key = credentials["elevenlabs_key"]
-        logger.info(f"Generating audio using ElevenLabs key ending in ...{key[-3:]}")
-        
-        client = ElevenLabs(api_key=key)
-        
-        # Generate the audio
-        audio_generator = client.text_to_speech.convert(
-            voice_id="cgSgspJ2msm6clMCkdW9",
-            output_format="mp3_44100_128",
-            text=request.text,
-            model_id="eleven_multilingual_v2",
-        )
+        if request.provider == "openai":
+            # Use OpenAI TTS
+            client = OpenAI(api_key=credentials["openai_key"])
+            response = client.audio.speech.create(
+                model="tts-1",
+                voice=request.voice or "alloy",  # Default to alloy if no voice specified
+                input=request.text
+            )
+            
+            # Convert streaming response to BytesIO
+            audio_stream = BytesIO()
+            for chunk in response.iter_bytes():
+                audio_stream.write(chunk)
+            audio_stream.seek(0)
 
-        # Get the audio stream
-        audio_stream = save_audio_from_generator(audio_generator)
+        else:  # elevenlabs
+            # Use existing ElevenLabs implementation
+            client = ElevenLabs(api_key=credentials["elevenlabs_key"])
+            audio_generator = client.text_to_speech.convert(
+                voice_id="cgSgspJ2msm6clMCkdW9",  # Fixed voice ID for ElevenLabs
+                output_format="mp3_44100_128",
+                text=request.text,
+                model_id="eleven_multilingual_v2",
+            )
+            audio_stream = save_audio_from_generator(audio_generator)
 
-        # Return the audio as a StreamingResponse
         return StreamingResponse(
             audio_stream,
             media_type="audio/mpeg",
             headers={"Content-Disposition": "attachment; filename=output_audio.mp3"}
         )
     except Exception as e:
+        logger.error(f"Error generating audio: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

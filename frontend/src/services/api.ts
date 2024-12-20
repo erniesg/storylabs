@@ -114,13 +114,20 @@ export async function fetchGeneratedImage(prompt: string, keys: any): Promise<st
   return imageUrl;      
 }
 
-export async function playAudio(text: string) {
+export async function playAudio(
+  text: string, 
+  voice: string = 'alloy', 
+  provider: 'openai' | 'elevenlabs' = 'elevenlabs'
+): Promise<void> {
+  console.log('🎧 Starting audio request:', { text, voice, provider });
+  
   const keys = getStoredKeys();
   if (!keys) {
     throw new Error('No credentials found');
   }
 
   try {
+    const startFetch = Date.now();
     const response = await fetch(`${API_URL}/api/story/generate-audio`, {
       method: 'POST',
       headers: {
@@ -128,20 +135,72 @@ export async function playAudio(text: string) {
         ...(keys.accessCode && { 'X-Access-Code': keys.accessCode }),
         ...(keys.openaiKey && { 'X-OpenAI-Key': keys.openaiKey }),
         ...(keys.elevenLabsKey && { 'X-ElevenLabs-Key': keys.elevenLabsKey }),
-        ...(keys.replicateToken && { 'X-Replicate-Token': keys.replicateToken }),
       },
-      body: JSON.stringify({ text: text }),
+      body: JSON.stringify({ 
+        text,
+        provider,
+        ...(provider === 'openai' && { voice })
+      }),
+    });
+
+    console.log('📡 Audio response received:', {
+      status: response.status,
+      latency: `${Date.now() - startFetch}ms`
     });
 
     if (!response.ok) {
       throw new Error('Failed to generate audio');
     }
 
-    const audioBlob = await response.blob();
-    const audioUrl = URL.createObjectURL(audioBlob);
-    const audio = new Audio(audioUrl);
-    audio.play();
+    // Create a MediaSource
+    const mediaSource = new MediaSource();
+    const audio = new Audio();
+    audio.src = URL.createObjectURL(mediaSource);
+
+    let chunksReceived = 0;
+    const startStream = Date.now();
+
+    return new Promise((resolve, reject) => {
+      mediaSource.addEventListener('sourceopen', async () => {
+        try {
+          const reader = response.body!.getReader();
+          const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
+          
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunksReceived++;
+            
+            // Wait for the buffer to be ready
+            await new Promise(resolve => {
+              if (!sourceBuffer.updating) resolve(null);
+              else sourceBuffer.addEventListener('updateend', () => resolve(null), { once: true });
+            });
+            
+            sourceBuffer.appendBuffer(value);
+          }
+          
+          console.log('🎵 Stream complete:', {
+            chunks: chunksReceived,
+            duration: `${Date.now() - startStream}ms`
+          });
+
+          mediaSource.endOfStream();
+          audio.play();
+          
+          audio.onended = () => {
+            console.log('🏁 Audio playback complete');
+            resolve();
+          };
+          audio.onerror = () => reject(new Error('Audio playback failed'));
+        } catch (error) {
+          console.error('❌ Streaming error:', error);
+          reject(error);
+        }
+      });
+    });
   } catch (error) {
-    console.error('Error playing audio:', error);
+    console.error('❌ Audio error:', error);
+    throw error;
   }
 }

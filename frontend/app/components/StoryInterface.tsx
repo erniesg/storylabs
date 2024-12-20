@@ -1,18 +1,11 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { SceneParser } from '@/lib/story/SceneParser'
-import { StorySequencer } from '@/lib/story/StorySequencer'
-import { WavRenderer } from '@/lib/wavtools/WavRenderer'
-import type { ParsedScene, StoryEvent } from '@/lib/story/SceneParser'
-import { audioService } from '@/lib/audio/AudioService'
-import { useStoryGeneration } from '@/hooks/useStoryGeneration'
-import { LoadingSpinner } from '@/app/components/LoadingSpinner'
-import ImageComponent from './ImageComponent' // Import the ImageComponent
-import { playAudio } from '@/src/services/api'
+import { useStoryProgression } from '@/hooks/useStoryProgression'
 import { ChevronRight } from 'lucide-react'
+import { LoadingSpinner } from '@/app/components/LoadingSpinner'
 
 interface StoryInterfaceProps {
   userInfo: {
@@ -20,123 +13,32 @@ interface StoryInterfaceProps {
     age: string;
     interests: string;
   };
-  story: any; // Replace 'any' with the actual type of your story object
+  story: any; // Replace with proper type
   generationError: string | null;
 }
 
 export default function StoryInterface({ userInfo, story, generationError }: StoryInterfaceProps) {
-  console.log('StoryInterface props:', { userInfo, story, generationError });
-  const [sequencer, setSequencer] = useState<StorySequencer | null>(null);
-  const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
-  const [currentEventIndex, setCurrentEventIndex] = useState(0);
-  const [scene, setScene] = useState<ParsedScene | null>(null);
+  const {
+    currentScene,
+    currentEvent,
+    isPlaying,
+    initializeFirstEvent,
+    handleNext,
+    canProgress,
+    progress
+  } = useStoryProgression(story, 'openai');
 
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number | undefined>(undefined);
-
-  //const currentEvent = scene?.events[currentEventIndex];
-  //const isAudioPlaying = sequencer?.getEventStatus(currentEvent?.id || '') === 'playing';
-  const currentSceneId = story?.main.flow[currentSceneIndex];
-  const audioPlayedRef = useRef(false);
-
-
-  /* useEffect(() => {
-    if (!story || !currentSceneId) return;
-
-    let mounted = true;
-
-    async function loadScene() {
-      try {
-        let seq = sequencer;
-        if (!seq) {
-          seq = new StorySequencer({});
-          if (!mounted) return;
-          setSequencer(seq);
-        }
-
-        const sceneContent = story?.scenes.find(s => s.id === currentSceneId);
-        console.log(`sceneContent:`, sceneContent);
-        if (!sceneContent) return;
-
-        const parser = new SceneParser(JSON.stringify(story.scenes));
-        console.log(`parser:`, parser);
-        const parsedScene = parser.parseScene(sceneContent);
-        console.log(`parsedScene:`, parsedScene);
-        await seq.loadScene(parsedScene);
-
-        if (!mounted) return;
-        setScene(parsedScene);
-        setCurrentEventIndex(0);
-
-        //await audioService.unlockAudio();
-        //await seq.processNextEvent();
-      } catch (error) {
-        console.error('Error loading scene:', error);
-      }
-    }
-
-    loadScene();
-    return () => {
-      mounted = false;
-    };
-  }, [story, currentSceneId]); */
-
-
+  // Only initialize first event once
   useEffect(() => {
-    if (story && story.scenes[currentSceneIndex]) {
-      const currentScene = story.scenes[currentSceneIndex];
-      const currentEvent = currentScene.events[currentEventIndex];
-  
-      if (!audioPlayedRef.current) {
-        playAudio(currentEvent.content);
-        audioPlayedRef.current = true; // Mark audio as played
-      }
-    }
-  }, [currentSceneIndex, currentEventIndex, story]);
-
-  const goToNextScene = async () => {
-    if (currentSceneIndex < story!.main.flow.length - 1) {
-      setCurrentSceneIndex(prev => prev + 1);
-    }
-    if (audioPlayedRef.current) {
-      audioPlayedRef.current = false;
-    }
-  };
-
-  //const goToPreviousScene = async () => {
-  //  if (currentSceneIndex > 0) {
-  //    setCurrentSceneIndex(prev => prev - 1);
-  //  }
-  //};
-
-  //const playCurrentEvent = async () => {
-  //  if (!sequencer || isAudioPlaying || !currentEvent) return;
-  //  await audioService.unlockAudio();
-  //  await sequencer.processNextEvent();
-  //};
-
-  //const goToNextEvent = () => {
-  //  if (scene && currentEventIndex < scene.events.length - 1 && !isAudioPlaying) {
-  //    setCurrentEventIndex(prev => prev + 1);
-  //  }
-  //};
-
-  //const goToPreviousEvent = () => {
-  //  if (currentEventIndex > 0 && !isAudioPlaying) {
-  //    setCurrentEventIndex(prev => prev - 1);
-  //  }
-  //};
+    initializeFirstEvent();
+  }, [initializeFirstEvent]);
 
   if (generationError) {
-    return (
-      <div className="text-red-500 text-center p-4">
-        Error: {generationError}
-      </div>
-    );
+    return <div className="text-red-500 text-center p-4">Error: {generationError}</div>;
   }
 
   if (!story) return null;
-  //console.log(`story`, story.scenes[currentSceneIndex].events[currentEventIndex].content)
+
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full">
       <div className="flex justify-between items-center mb-6">
@@ -144,28 +46,51 @@ export default function StoryInterface({ userInfo, story, generationError }: Sto
           {story.main.title}
         </h2>
         <div className="text-sm text-gray-600">
-          Scene {currentSceneIndex + 1} of {story.main.flow.length}
+          Scene {progress.scene} of {progress.totalScenes}
         </div>
       </div>
+
       <div className="relative h-80 mb-6">
         <AnimatePresence mode="wait">
           <motion.img
-              src={story?.scenes[currentSceneIndex].imageUrl || ''}
-              alt={story?.scenes[currentSceneIndex].name || 'Scene Image'}
-              className="w-full h-full object-cover"
-            />
+            key={currentScene?.imageUrl}
+            src={currentScene?.imageUrl}
+            alt={currentScene?.name}
+            className="w-full h-full object-cover rounded-lg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          />
         </AnimatePresence>
       </div>
+
       <div className="text-lg text-gray-700 mb-6">
-        {story.scenes[currentSceneIndex].events[currentEventIndex].content} 
+        {currentEvent?.content}
       </div>
-      <div className="flex justify-between items-center gap-4">
-        <div className="flex gap-2">
+
+      <div className="flex justify-between items-center">
+        <div className="text-sm text-gray-600">
+          Event {progress.event} of {progress.totalEvents}
+        </div>
+        
+        <div className="flex gap-4 items-center">
+          {isPlaying && (
+            <div className="flex items-center gap-2 text-purple-600">
+              <LoadingSpinner />
+              Playing audio...
+            </div>
+          )}
+          
           <Button
-            onClick={goToNextScene}
-            className="text-lg py-2 px-6 bg-yellow-400 hover:bg-yellow-500 text-purple-800 font-bold rounded-full transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center gap-2"
+            onClick={handleNext}
+            disabled={!canProgress || isPlaying}
+            className="text-lg py-2 px-6 bg-yellow-400 hover:bg-yellow-500 text-purple-800 font-bold rounded-full 
+                     transition-all duration-200 transform hover:scale-105 
+                     disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed 
+                     flex items-center gap-2"
           >
-            Next Scene
+            {progress.event < progress.totalEvents ? 'Next Event' : 'Next Scene'}
             <ChevronRight className="w-5 h-5" />
           </Button>
         </div>
