@@ -9,9 +9,13 @@ import { LoadingSpinner } from '@/app/components/LoadingSpinner'
 import ReviewPage from './ReviewPage'
 
 interface StoryEvent {
-  type: 'speak' | 'narrate';
+  type: 'speak' | 'narrate' | 'input';
   character?: string;
-  content: string;
+  content?: string;
+  voice?: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
+  emotion?: string;
+  id?: string;
+  order?: number;
 }
 
 interface StoryInterfaceProps {
