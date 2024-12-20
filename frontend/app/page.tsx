@@ -46,12 +46,10 @@ export default function Home() {
       {stage === 'userInput' && <UserInputForm onSubmit={handleUserInfoSubmit} />}
       {stage === 'story' && <StoryInterface userInfo={userInfo} story={story} generationError={generationError} />}
       {isGenerating && (
-        <>
-          <div className="flex items-center justify-center h-96">
-            <LoadingSpinner />
-            <p className="ml-2 text-white">Generating your story. This should take less than a minute...</p>
-          </div>
-        </>
+        <div className="absolute bottom-24 flex items-center justify-center">
+          <LoadingSpinner />
+          <p className="ml-2 text-white">Generating your story. This should take less than a minute...</p>
+        </div>
       )}
     </main>
   )
