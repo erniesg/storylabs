@@ -8,6 +8,12 @@ import { ChevronRight, MessageCircle } from 'lucide-react'
 import { LoadingSpinner } from '@/app/components/LoadingSpinner'
 import ReviewPage from './ReviewPage'
 
+interface StoryEvent {
+  type: 'speak' | 'narrate';
+  character?: string;
+  content: string;
+}
+
 interface StoryInterfaceProps {
   userInfo: {
     name: string;
