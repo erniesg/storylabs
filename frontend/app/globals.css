@@ -69,6 +69,28 @@
                 0 2px 4px -1px rgba(0, 0, 0, 0.06),
                 0 0 0 1px rgba(255, 255, 255, 0.1);
   }
+
+  /* Add new speaking animation utilities */
+  .speaking-pulse {
+    @apply relative;
+  }
+
+  .speaking-pulse::before {
+    @apply absolute inset-0 rounded-full bg-purple-200 animate-pulse;
+    content: '';
+  }
+
+  .character-name {
+    @apply font-semibold text-purple-700;
+  }
+
+  .character-speech {
+    @apply italic text-gray-800;
+  }
+
+  .narrator-text {
+    @apply text-gray-700 leading-relaxed;
+  }
 }
 
 /* Animations */
@@ -81,6 +103,25 @@
   }
 }
 
+@keyframes speaking-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+}
+
 .animate-float {
   animation: float 3s ease-in-out infinite;
+}
+
+.animate-speaking {
+  animation: speaking-ripple 1.5s ease-in-out infinite;
 }

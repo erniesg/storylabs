@@ -40,11 +40,24 @@ export default function Home() {
     //setStage('story')
   }
 
+  const handleStartNewStory = () => {
+    setStage('userInput');
+    // Note: We keep the existing userInfo state, 
+    // which will automatically prefill the form
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-blue-400 to-purple-500">
       {stage === 'landing' && <LandingPage onStart={handleStart} />}
       {stage === 'userInput' && <UserInputForm onSubmit={handleUserInfoSubmit} />}
-      {stage === 'story' && <StoryInterface userInfo={userInfo} story={story} generationError={generationError} />}
+      {stage === 'story' && (
+        <StoryInterface 
+          userInfo={userInfo} 
+          story={story} 
+          generationError={generationError}
+          onStartNewStory={handleStartNewStory}
+        />
+      )}
       {isGenerating && (
         <>
           <div className="flex items-center justify-center h-96">

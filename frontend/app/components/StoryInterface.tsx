@@ -4,8 +4,9 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { useStoryProgression } from '@/hooks/useStoryProgression'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, MessageCircle } from 'lucide-react'
 import { LoadingSpinner } from '@/app/components/LoadingSpinner'
+import ReviewPage from './ReviewPage'
 
 interface StoryInterfaceProps {
   userInfo: {
@@ -15,9 +16,19 @@ interface StoryInterfaceProps {
   };
   story: any; // Replace with proper type
   generationError: string | null;
+  onStartNewStory: () => void;
 }
 
-export default function StoryInterface({ userInfo, story, generationError }: StoryInterfaceProps) {
+const SpeakingAvatar = () => (
+  <div className="relative inline-flex items-center justify-center w-8 h-8 mr-3">
+    <motion.div
+      className="absolute w-full h-full bg-purple-200 rounded-full animate-speaking"
+    />
+    <MessageCircle className="w-5 h-5 text-purple-600 z-10" />
+  </div>
+);
+
+export default function StoryInterface({ userInfo, story, generationError, onStartNewStory }: StoryInterfaceProps) {
   const {
     currentScene,
     currentEvent,
@@ -28,10 +39,43 @@ export default function StoryInterface({ userInfo, story, generationError }: Sto
     progress
   } = useStoryProgression(story, 'openai');
 
+  // Add state for showing review
+  const [showReview, setShowReview] = useState(false);
+
+  // Modify handleNext to show review when story ends
+  const handleNextWithReview = async () => {
+    if (!canProgress) {
+      // If we can't progress anymore, show the review page
+      setShowReview(true);
+    } else {
+      await handleNext();
+    }
+  };
+
   // Only initialize first event once
   useEffect(() => {
     initializeFirstEvent();
   }, [initializeFirstEvent]);
+
+  const formatContent = (event: StoryEvent) => {
+    if (event.type === 'speak') {
+      return (
+        <div className="flex items-start">
+          <SpeakingAvatar />
+          <div>
+            <span className="character-name">{event.character}:</span>
+            <span className="character-speech ml-2">"{event.content}"</span>
+          </div>
+        </div>
+      );
+    }
+    // For narration, return plain text
+    return <div className="narrator-text">{event.content}</div>;
+  };
+
+  if (showReview) {
+    return <ReviewPage story={story} onStartNewStory={onStartNewStory} />;
+  }
 
   if (generationError) {
     return <div className="text-red-500 text-center p-4">Error: {generationError}</div>;
@@ -65,8 +109,8 @@ export default function StoryInterface({ userInfo, story, generationError }: Sto
         </AnimatePresence>
       </div>
 
-      <div className="text-lg text-gray-700 mb-6">
-        {currentEvent?.content}
+      <div className="text-lg mb-6">
+        {currentEvent && formatContent(currentEvent)}
       </div>
 
       <div className="flex justify-between items-center">
@@ -83,7 +127,7 @@ export default function StoryInterface({ userInfo, story, generationError }: Sto
           )}
           
           <Button
-            onClick={handleNext}
+            onClick={handleNextWithReview}
             disabled={!canProgress || isPlaying}
             className="text-lg py-2 px-6 bg-yellow-400 hover:bg-yellow-500 text-purple-800 font-bold rounded-full 
                      transition-all duration-200 transform hover:scale-105 

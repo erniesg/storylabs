@@ -3,12 +3,12 @@ import { playAudio } from '@/src/services/api';
 
 interface StoryEvent {
   type: 'narrate' | 'speak' | 'input';
-  character?: {
-    name: string;
-    voice: string;
-  };
+  character: string;
+  voice: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
   content?: string;
-  emotion?: string;
+  emotion: string;
+  id: string;
+  order: number;
 }
 
 interface Scene {
@@ -40,17 +40,14 @@ export function useStoryProgression(
       sceneId: currentScene?.id,
       eventType: eventToPlay.type,
       isInitialized: hasInitializedRef.current,
-      character: eventToPlay.character?.name || 'Narrator',
-      text: eventToPlay.content
+      character: eventToPlay.character || 'Narrator',
+      text: eventToPlay.content,
+      voice: eventToPlay.voice
     });
 
     setIsPlaying(true);
     try {
-      const voice = eventToPlay.type === 'narrate' 
-        ? 'alloy' 
-        : eventToPlay.character?.voice || 'alloy';
-
-      playingRequestRef.current = playAudio(eventToPlay.content || '', voice, audioProvider);
+      playingRequestRef.current = playAudio(eventToPlay.content || '', eventToPlay.voice, audioProvider);
       const startTime = Date.now();
       
       await playingRequestRef.current;
