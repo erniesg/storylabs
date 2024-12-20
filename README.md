@@ -1,36 +1,57 @@
 # StoryLabs
 
+StoryLabs is a full-stack web app leveraging multimodal AI to engage and grow with young readers through stories.
+
+## Tech Stack 🛠️
+
+### Frontend 🎨
+- Next.js
+- Tailwind CSS
+- Framer Motion
+
+### Backend 🔧
+- FastAPI
+- Python
+
+### AI Services 🤖
+- OpenAI - Text generation and speech
+- Replicate - Image generation
+- ElevenLabs - Text-to-speech synthesis
+
 ## Getting Started
 
 ### Prerequisites
 
 - Docker installed on your machine
 
-### Running with Docker
+### Running Locally with Docker
 
-1. Create a .env file in the backend directory ./backend/.env with the following variables:
+1. Create a .env file in the backend directory `./backend/.env` with the following variables:
 ```
-OPENAI_API_KEY=sk-svisdjt-XByasda11xxxxxxxxxxxxxxxxxxxxxxxx
-ELEVENLABS_API_KEY=sk_22fb41exxxxxxxx
-REPLICATE_API_TOKEN=r8_6Nb1nXjdmxxxxxxxx
+OPENAI_API_KEY=your-openai-key
+ELEVENLABS_API_KEY=your-elevenlabs-key
+REPLICATE_API_TOKEN=your-replicate-key
+ACCESS_CODE=your-chosen-access-code
 ```
 
-2. Build the docker image and run the container:
-   ```bash
-   docker-compose up --build
-   ```
+2. Create a .env file in the frontend directory `./frontend/.env.local` with:
+```
+NEXT_PUBLIC_ACCESS_CODE=your-chosen-access-code
+```
+Note: Use the same access code value in both files.
 
-3. Access the application at http://localhost:3000
+3. Build and run the development containers:
+```bash
+docker-compose -f docker-compose.dev.yml up --build
+```
 
-### Troubleshooting Voice Generation
+4. Access the application at http://localhost:3000
 
-If you encounter a voice-related error (e.g., "voice_not_found"), you'll need to update the voice ID in your configuration:
+### Using the Application
 
-1. Visit [ElevenLabs](https://elevenlabs.io/) and log in
-2. Go to [Voices](https://elevenlabs.io/app/voice-lab)
-3. Click "View" on the voice you'd like to use
-4. Find and copy the Voice ID from the bottom right corner
-5. Update the voice ID in `backend/app/api/endpoints/story.py`
+1. When you first open the application, you'll be prompted for an access code
+2. Enter the access code you defined in your environment variables
+3. The application will use the system's API keys for all operations
 
 ### Online Demo
 
