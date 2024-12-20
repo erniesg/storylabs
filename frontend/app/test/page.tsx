@@ -6,6 +6,11 @@ import StoryInterface from '@/app/components/StoryInterface'
 export default function TestPage() {
   const [isStarted, setIsStarted] = useState(false)
 
+  const handleStartNewStory = () => {
+    // Reset to initial state or handle new story logic
+    setIsStarted(false);
+  };
+
   if (!isStarted) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -29,6 +34,7 @@ export default function TestPage() {
         }}
         story={null}
         generationError={null}
+        onStartNewStory={handleStartNewStory}
       />
     </div>
   );
